@@ -1,6 +1,6 @@
 # Yarn Spinner
 
-An iPad web app that helps 5th graders get unstuck while writing a monster story. An adult runs it on one shared iPad, sitting with a student. Two spin-the-wheel tools:
+An iPad web app that helps 5th graders get unstuck while writing a story. An adult runs it on one shared iPad, sitting with a student. Two spin-the-wheel tools:
 
 - **Find a Better Word** turns a tired word ("good", "said") into a more descriptive one, with a kid-friendly definition and an example sentence.
 - **I'm Stuck** suggests what kind of sentence to write next ("Add dialogue", "Make it worse").
