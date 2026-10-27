@@ -17,7 +17,7 @@ The full spec is in [docs/writing-spinner-spec.md](docs/writing-spinner-spec.md)
 
 - **Sound** is off by default. Tap the speaker button in the corner to turn it on.
 - **The little dot** in the bottom-right corner is green when the last internet lookup worked and grey when it didn't. It's only there for you.
-- **Helper settings:** press and hold the monster on the home screen for about 2 seconds. From there you can download extra words for offline use before a session, see what's saved, or clear it.
+- **Helper settings:** press and hold the cat on the home screen for about 2 seconds. From there you can download extra words for offline use before a session, see what's saved, or clear it.
 
 ## How words are found
 
@@ -45,3 +45,7 @@ python3 -m http.server 8000
 ```
 
 Then open http://localhost:8000.
+
+## Credits
+
+Cat illustration by limoncitosketching on Pixabay (`docs/limoncitosketching-cat-4475583.png`). `img/cat.png` is a smaller copy for the app.

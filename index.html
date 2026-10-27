@@ -13,7 +13,7 @@
 <title>Yarn Spinner</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
 <style>
 :root {
   --bg: #FFF7EA;
@@ -156,9 +156,9 @@ h1, h2, h3, p { margin: 0; }
 /* ---------- Home ---------- */
 .home { justify-content: center; align-items: center; gap: 36px; text-align: center; }
 .home-hero { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.mascot svg { display: block; width: 100%; height: auto; }
+.mascot img { display: block; width: 100%; height: auto; pointer-events: none; -webkit-touch-callout: none; }
 .mascot-home {
-  width: min(220px, 42vw);
+  width: min(280px, 50vw);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -222,7 +222,7 @@ h1, h2, h3, p { margin: 0; }
 .big-input.shake { animation: shake 0.35s; }
 .big-input.list-input { font-size: 30px; }
 .hint { font-size: 20px; color: var(--ink-soft); min-height: 1.4em; }
-.mascot-small { width: 120px; }
+.mascot-small { width: 150px; }
 .msg { font-size: 30px; font-weight: 800; }
 .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
 .chip {
@@ -403,8 +403,6 @@ h1, h2, h3, p { margin: 0; }
 .net-dot.on { background: var(--dot-on); }
 
 /* ---------- Animations ---------- */
-.mascot-eye { transform-box: fill-box; transform-origin: center; animation: blink 4.5s infinite; }
-@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
 @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
 @keyframes dot { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-12px); opacity: 1; } }
@@ -422,32 +420,6 @@ h1, h2, h3, p { margin: 0; }
 </head>
 <body>
 
-<template id="mascot-tpl">
-  <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">
-    <path d="M62 60 Q56 30 74 16 Q78 40 88 52 Z" fill="#FFC93C"/>
-    <path d="M138 60 Q144 30 126 16 Q122 40 112 52 Z" fill="#FFC93C"/>
-    <path d="M34 120 Q10 106 18 82" stroke="#7C5CFF" stroke-width="15" stroke-linecap="round" fill="none"/>
-    <path d="M166 122 Q188 134 182 156" stroke="#7C5CFF" stroke-width="15" stroke-linecap="round" fill="none"/>
-    <ellipse cx="72" cy="184" rx="23" ry="11" fill="#5A3BD6"/>
-    <ellipse cx="128" cy="184" rx="23" ry="11" fill="#5A3BD6"/>
-    <path d="M100 40 C152 40 176 80 176 122 C176 162 146 184 100 184 C54 184 24 162 24 122 C24 80 48 40 100 40 Z" fill="#7C5CFF"/>
-    <ellipse cx="100" cy="150" rx="44" ry="28" fill="#A48BFF"/>
-    <circle cx="50" cy="96" r="7" fill="#A48BFF"/>
-    <circle cx="152" cy="90" r="5" fill="#A48BFF"/>
-    <circle cx="160" cy="108" r="3.5" fill="#A48BFF"/>
-    <circle cx="62" cy="126" r="8" fill="#FF8FB1" opacity="0.7"/>
-    <circle cx="138" cy="126" r="8" fill="#FF8FB1" opacity="0.7"/>
-    <g class="mascot-eye">
-      <circle cx="100" cy="90" r="30" fill="#FFFFFF"/>
-      <circle cx="106" cy="94" r="14" fill="#241B4B"/>
-      <circle cx="111" cy="88" r="4.5" fill="#FFFFFF"/>
-    </g>
-    <path d="M70 128 Q100 160 130 128 Q100 138 70 128 Z" fill="#241B4B"/>
-    <path d="M83 131 L89 141 L95 132.6 Z" fill="#FFFFFF"/>
-    <path d="M105 132.6 L111 141 L117 131 Z" fill="#FFFFFF"/>
-  </svg>
-</template>
-
 <template id="wheel-tpl">
   <div class="wheel-wrap" role="button" tabindex="0">
     <svg class="wheel-rotor" viewBox="0 0 400 400" aria-hidden="true" focusable="false"></svg>
@@ -462,7 +434,7 @@ h1, h2, h3, p { margin: 0; }
 <!-- Home -->
 <section id="home" class="screen home">
   <div class="home-hero">
-    <div class="mascot mascot-home" data-mascot role="img" aria-label="Spinny the monster"></div>
+    <div class="mascot mascot-home"><img src="img/cat.png" alt="Yarn Spinner cat" width="640" height="538" draggable="false"></div>
     <h1 class="app-title">Yarn Spinner</h1>
     <p class="tagline">Spin the wheel. Write a monster story!</p>
   </div>
@@ -490,7 +462,7 @@ h1, h2, h3, p { margin: 0; }
   </div>
 
   <div class="panel" data-view="loading" hidden>
-    <div class="mascot mascot-small" data-mascot></div>
+    <div class="mascot mascot-small"><img src="img/cat.png" alt="" width="640" height="538" draggable="false"></div>
     <p class="msg">Looking it up…</p>
     <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
   </div>
@@ -502,7 +474,7 @@ h1, h2, h3, p { margin: 0; }
   </div>
 
   <div class="panel" data-view="fallback" hidden>
-    <div class="mascot mascot-small" data-mascot></div>
+    <div class="mascot mascot-small"><img src="img/cat.png" alt="" width="640" height="538" draggable="false"></div>
     <p class="msg" id="fallback-msg"></p>
     <div id="fallback-try" class="chips"></div>
     <div class="row">
@@ -548,7 +520,7 @@ h1, h2, h3, p { margin: 0; }
   </div>
 </section>
 
-<!-- Hidden helper settings (long-press the monster on Home) -->
+<!-- Hidden helper settings (long-press the cat on Home) -->
 <section id="settings" class="screen" hidden>
   <header class="topbar">
     <button class="back" type="button" data-go="home">← Home</button>
@@ -2193,7 +2165,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* =====================================================================
-   Hidden helper settings: press and hold the monster on Home
+   Hidden helper settings: press and hold the cat on Home
    ===================================================================== */
 const homeMascot = $('.mascot-home');
 let holdTimer = null;
@@ -2276,7 +2248,6 @@ clearBtn.addEventListener('click', () => {
 /* =====================================================================
    Start up
    ===================================================================== */
-for (const el of $$('[data-mascot]')) el.append($('#mascot-tpl').content.cloneNode(true));
 renderMute();
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeech(); });
 
