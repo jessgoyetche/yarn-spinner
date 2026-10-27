@@ -1,6 +1,6 @@
 // Caches the whole app so it opens with no Wi-Fi after the first visit.
 // Bump the version whenever ASSETS changes.
-const CACHE = 'yarn-spinner-v3';
+const CACHE = 'yarn-spinner-v4';
 const ASSETS = [
   './',
   './index.html',

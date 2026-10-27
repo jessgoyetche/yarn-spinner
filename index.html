@@ -426,7 +426,7 @@ h1, h2, h3, p { margin: 0; }
     <svg class="wheel-overlay" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
       <circle class="hub" cx="200" cy="200" r="30"/>
       <circle class="hub-dot" cx="200" cy="200" r="10"/>
-      <path class="pointer" d="M176 4 H224 L200 48 Z"/>
+      <path class="pointer" d="M180 4 H220 L200 38 Z"/>
     </svg>
   </div>
 </template>
@@ -485,7 +485,7 @@ h1, h2, h3, p { margin: 0; }
 
   <div class="panel" data-view="own" hidden>
     <form id="own-form" class="stack" autocomplete="off">
-      <label class="panel-label" for="own-input">Type 3 to 8 words for the wheel</label>
+      <label class="panel-label" for="own-input">Type 3 to 16 words for the wheel</label>
       <input id="own-input" class="big-input list-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" placeholder="stomped, crept, zoomed">
       <p class="hint" id="own-hint">Put a comma or space between the words.</p>
       <div class="row">
@@ -560,6 +560,8 @@ h1, h2, h3, p { margin: 0; }
 /* =====================================================================
    Built-in word book
    Each replacement is [word, kid-friendly definition, example sentence].
+   Mix everyday words with harder "stretch" words to grow vocabulary, but keep
+   every definition in simple words. Up to 16 per list fills a whole wheel.
    `forms` lists other spellings that should find the same entry.
    Words with more than one meaning use `senses` instead of `words`.
    ===================================================================== */
@@ -573,6 +575,11 @@ const WORDS = {
       ['generous', 'happy to share and give to others', 'The generous monster shared its whole bag of cookies.'],
       ['thoughtful', 'thinking about what others need or feel', 'The thoughtful monster saved Leo a seat.'],
       ['sweet', 'kind and easy to love', 'The sweet monster sang the baby to sleep.'],
+      ['compassionate', 'caring about others who are hurting', 'The compassionate monster bandaged the bird’s wing.'],
+      ['benevolent', 'kind and wanting to do good', 'The benevolent giant gave out free apples.'],
+      ['considerate', 'careful to think of others’ feelings', 'The considerate monster tiptoed past the sleeping baby.'],
+      ['warmhearted', 'kind and loving', 'The warmhearted monster adopted a stray cat.'],
+      ['patient', 'calm and willing to wait', 'The patient monster waited its turn.'],
     ]},
     { label: 'tasty', icon: '🍰', words: [
       ['delicious', 'tasting really, really good', 'The monster slurped a delicious bowl of worm soup.'],
@@ -582,6 +589,12 @@ const WORDS = {
       ['flavorful', 'full of strong, good taste', 'The monster stirred the flavorful swamp stew.'],
       ['tasty', 'good to eat', 'The monster munched on a tasty pickle.'],
       ['juicy', 'full of sweet juice', 'The monster bit into a juicy pear.'],
+      ['delectable', 'super delicious', 'Grandma made delectable cookies.'],
+      ['succulent', 'juicy and tender', 'The dragon roasted a succulent turkey.'],
+      ['savory', 'tasty and salty, not sweet', 'The monster loved savory pretzels.'],
+      ['appetizing', 'looking or smelling good to eat', 'The monster set out an appetizing feast.'],
+      ['luscious', 'rich, sweet, and juicy', 'The monster ate a luscious peach.'],
+      ['heavenly', 'so tasty it seems magical', 'The hot cocoa was heavenly.'],
     ]},
     { label: 'skilled', icon: '🏆', words: [
       ['talented', 'naturally really good at something', 'The talented monster juggled six pumpkins.'],
@@ -590,6 +603,12 @@ const WORDS = {
       ['brilliant', 'amazingly smart or good at something', 'Leo had a brilliant plan to trap the monster.'],
       ['clever', 'quick at thinking and figuring things out', 'The clever monster hid behind the curtain.'],
       ['excellent', 'very, very good', 'The monster was an excellent dancer.'],
+      ['adept', 'very good at something', 'Mia is adept at climbing trees.'],
+      ['proficient', 'skilled from lots of practice', 'The monster became proficient at juggling.'],
+      ['masterful', 'showing great skill', 'Mia made a masterful drawing.'],
+      ['accomplished', 'very skilled after years of practice', 'The accomplished monster played the piano.'],
+      ['capable', 'able to do things well', 'The capable monster fixed the leaky roof.'],
+      ['gifted', 'born with a special talent', 'The gifted monster could paint with its tail.'],
     ]},
     { label: 'great', icon: '🎉', words: [
       ['wonderful', 'very good and makes you happy', 'We had a wonderful time at the monster party.'],
@@ -598,6 +617,12 @@ const WORDS = {
       ['awesome', 'so cool it makes you say “wow”', 'Riding on the dragon’s back was awesome.'],
       ['amazing', 'so good it surprises you', 'The monster built an amazing sandcastle.'],
       ['perfect', 'just right, with nothing wrong', 'It was a perfect day for a monster picnic.'],
+      ['phenomenal', 'amazingly great', 'The monster’s cartwheel was phenomenal.'],
+      ['magnificent', 'grand and beautiful', 'The castle was magnificent.'],
+      ['splendid', 'very fine and impressive', 'The monster’s costume was splendid.'],
+      ['marvelous', 'so good it seems almost magic', 'We had a marvelous time at the fair.'],
+      ['spectacular', 'amazing to see', 'The fireworks were spectacular.'],
+      ['outstanding', 'much better than most', 'Mia did an outstanding job.'],
     ]},
   ]},
 
@@ -609,6 +634,11 @@ const WORDS = {
       ['naughty', 'not behaving; breaking the rules', 'The naughty monster drew on the walls.'],
       ['evil', 'as bad and mean as can be', 'An evil shadow crept across the village.'],
       ['mischievous', 'playfully causing small trouble', 'The mischievous monster hid everyone’s shoes.'],
+      ['malicious', 'wanting to hurt others', 'The malicious troll set a trap.'],
+      ['spiteful', 'mean on purpose to get back at someone', 'The spiteful troll popped our balloons.'],
+      ['vicious', 'fierce and wanting to hurt', 'A vicious wolf growled at the door.'],
+      ['villainous', 'evil like a villain', 'The villainous wizard laughed.'],
+      ['rude', 'not polite; unkind', 'The rude monster cut in line.'],
     ]},
     { label: 'awful', icon: '⛈️', words: [
       ['awful', 'really, really bad', 'The monster had an awful cold.'],
@@ -617,6 +647,11 @@ const WORDS = {
       ['dreadful', 'so bad it fills you with worry', 'We heard dreadful news from the forest.'],
       ['disastrous', 'so bad it ruins everything', 'The monster’s first try at cooking was disastrous.'],
       ['lousy', 'pretty bad; not good at all', 'It was a lousy day to lose your flashlight.'],
+      ['atrocious', 'shockingly bad', 'The monster’s singing was atrocious.'],
+      ['abysmal', 'as bad as it gets', 'The monster’s spelling test was abysmal.'],
+      ['dire', 'very serious and bad', 'The village was in dire trouble.'],
+      ['dismal', 'very bad and gloomy', 'The team had a dismal season.'],
+      ['unpleasant', 'not nice or enjoyable', 'The cold rain was unpleasant.'],
     ]},
     { label: 'yucky', icon: '🤢', words: [
       ['disgusting', 'so gross it makes you feel sick', 'The monster’s sock smelled disgusting.'],
@@ -625,6 +660,11 @@ const WORDS = {
       ['spoiled', 'food that has gone bad', 'Spoiled milk sat in the monster’s fridge.'],
       ['foul', 'smelling or tasting really bad', 'A foul smell came from under the bed.'],
       ['moldy', 'covered in fuzzy spots from going bad', 'The monster munched a moldy sandwich.'],
+      ['nauseating', 'making your stomach feel sick', 'A nauseating smell came from the trash.'],
+      ['rancid', 'old and spoiled, with a nasty smell', 'The rancid cheese made the monster gag.'],
+      ['revolting', 'so gross it makes you want to look away', 'The swamp soup looked revolting.'],
+      ['icky', 'gross and sticky', 'The monster’s hands were icky with jam.'],
+      ['stale', 'old and not fresh', 'The bread was stale and hard.'],
     ]},
   ]},
 
@@ -638,6 +678,13 @@ const WORDS = {
     ['hulking', 'big, heavy, and clumsy-looking', 'The hulking monster squeezed through the doorway.'],
     ['mammoth', 'as big as a woolly mammoth', 'The monster carried a mammoth bag of candy.'],
     ['monstrous', 'big and scary, like a monster', 'A monstrous wave crashed on the shore.'],
+    ['gargantuan', 'enormously big, like a giant', 'A gargantuan wave crashed over the boat.'],
+    ['immense', 'so big it’s hard to measure', 'An immense cave opened in front of us.'],
+    ['vast', 'huge and spread out far', 'The monster crossed a vast, empty desert.'],
+    ['cavernous', 'huge and hollow inside, like a cave', 'The monster opened its cavernous mouth.'],
+    ['tremendous', 'very large or powerful', 'The monster let out a tremendous sneeze.'],
+    ['bulky', 'big and hard to carry', 'Leo dragged a bulky bag of rocks.'],
+    ['whopping', 'surprisingly big', 'The monster ate a whopping ten pancakes.'],
   ]},
 
   small: { forms: 'little', words: [
@@ -650,6 +697,13 @@ const WORDS = {
     ['pint-sized', 'small enough to fit in a cup', 'The pint-sized monster climbed onto the table.'],
     ['itty-bitty', 'super-duper small', 'It had itty-bitty teeth like grains of rice.'],
     ['compact', 'small and packed tightly', 'The monster folded into a compact ball.'],
+    ['minuscule', 'extremely small', 'A minuscule ant marched across the monster’s toe.'],
+    ['diminutive', 'unusually small', 'The diminutive monster stood on a stool to reach the sink.'],
+    ['infinitesimal', 'so small it’s almost nothing', 'Only an infinitesimal crumb was left on the plate.'],
+    ['petite', 'small and slim', 'The petite monster slipped through the crack.'],
+    ['slight', 'small and thin', 'A slight monster squeezed through the fence.'],
+    ['pocket-sized', 'small enough to fit in a pocket', 'Mia kept a pocket-sized monster in her backpack.'],
+    ['teensy', 'super, super tiny', 'The monster had one teensy freckle.'],
   ]},
 
   nice: { senses: [
@@ -660,6 +714,11 @@ const WORDS = {
       ['gentle', 'soft and careful, never rough', 'The gentle monster held the kitten like an egg.'],
       ['cheerful', 'happy and smiling', 'A cheerful monster whistled while it worked.'],
       ['caring', 'showing that you care about others', 'The caring monster made Leo some soup.'],
+      ['gracious', 'kind and polite', 'The gracious queen thanked the monster.'],
+      ['amiable', 'friendly and easy to like', 'The amiable monster made friends fast.'],
+      ['considerate', 'careful to think of others’ feelings', 'The considerate monster whispered in the library.'],
+      ['good-natured', 'friendly and easy to get along with', 'The good-natured monster laughed at the prank.'],
+      ['generous', 'happy to share and give to others', 'The generous monster gave away its toys.'],
     ]},
     { label: 'pleasant', icon: '☀️', words: [
       ['pleasant', 'making you feel calm and happy', 'It was a pleasant walk through the monster garden.'],
@@ -668,6 +727,11 @@ const WORDS = {
       ['enjoyable', 'fun to do', 'Flying kites with the monster was enjoyable.'],
       ['cozy', 'warm, snug, and comfy', 'The monster’s cave was cozy and warm.'],
       ['charming', 'so nice you can’t help liking it', 'The monster lived in a charming little cottage.'],
+      ['idyllic', 'peaceful and perfect', 'The monster lived in an idyllic meadow.'],
+      ['agreeable', 'pleasant and easy to like', 'It was an agreeable afternoon.'],
+      ['wonderful', 'very good and makes you happy', 'We had a wonderful day.'],
+      ['relaxing', 'calm and restful', 'The bubble bath was relaxing.'],
+      ['comfy', 'soft and comfortable', 'The monster sat in a comfy chair.'],
     ]},
   ]},
 
@@ -682,6 +746,12 @@ const WORDS = {
     ['hair-raising', 'so scary it makes your hair stand up', 'The ride down the dark tunnel was hair-raising.'],
     ['menacing', 'looking like it might hurt you', 'The monster gave a menacing growl.'],
     ['sinister', 'evil and scary-looking', 'A sinister shadow slid under the door.'],
+    ['ominous', 'seeming like something bad will happen', 'Ominous clouds gathered over the castle.'],
+    ['fearsome', 'scary and powerful', 'The fearsome dragon guarded its gold.'],
+    ['nightmarish', 'scary like a bad dream', 'The forest looked nightmarish at midnight.'],
+    ['bloodcurdling', 'so scary it seems to freeze your blood', 'We heard a bloodcurdling scream.'],
+    ['ghostly', 'pale and spooky, like a ghost', 'A ghostly figure floated down the hall.'],
+    ['haunting', 'scary in a way you can’t forget', 'The wolf’s haunting howl filled the night.'],
   ]},
 
   scared: { forms: 'scare', words: [
@@ -694,6 +764,13 @@ const WORDS = {
     ['panicked', 'so scared you can’t think clearly', 'The panicked monster ran in circles.'],
     ['uneasy', 'a little worried, like something is wrong', 'Mia felt uneasy in the quiet forest.'],
     ['spooked', 'suddenly scared by something', 'The horse got spooked by the monster’s sneeze.'],
+    ['apprehensive', 'worried about what might happen', 'Mia felt apprehensive before her speech.'],
+    ['unnerved', 'shaken up and less brave', 'Leo was unnerved by the empty hallway.'],
+    ['horrified', 'shocked and very scared', 'Mia was horrified to see the broken eggs.'],
+    ['alarmed', 'suddenly worried that something is wrong', 'Mia was alarmed by the claw marks.'],
+    ['startled', 'surprised and a little scared', 'The startled monster dropped its sandwich.'],
+    ['timid', 'shy and easily scared', 'The timid monster hid behind its mom.'],
+    ['quaking', 'shaking with fear', 'The quaking monster hid under the covers.'],
   ]},
 
   happy: { words: [
@@ -707,6 +784,12 @@ const WORDS = {
     ['gleeful', 'happy in a giggly, excited way', 'The monster gave a gleeful squeal.'],
     ['pleased', 'happy with how something went', 'The monster looked pleased with its sandcastle.'],
     ['ecstatic', 'as happy as you can get', 'The team was ecstatic when they won.'],
+    ['jubilant', 'full of happy celebration', 'The jubilant crowd cheered for the monster.'],
+    ['exuberant', 'bursting with happy energy', 'The exuberant monster bounced around the room.'],
+    ['euphoric', 'filled with huge happiness', 'Leo felt euphoric after scoring the goal.'],
+    ['elated', 'very excited and happy', 'Mia was elated when she won the race.'],
+    ['content', 'calm and happy with what you have', 'The content monster purred by the fire.'],
+    ['carefree', 'happy with no worries', 'The carefree monster skipped through the meadow.'],
   ]},
 
   sad: { words: [
@@ -720,6 +803,12 @@ const WORDS = {
     ['blue', 'feeling a little sad', 'The monster felt blue without its friends.'],
     ['mopey', 'sad and slow, not wanting to do anything', 'The mopey monster dragged its feet.'],
     ['sorrowful', 'full of deep sadness', 'A sorrowful song drifted from the cave.'],
+    ['melancholy', 'quietly sad for a long time', 'A melancholy song drifted from the tower.'],
+    ['despondent', 'so sad you’ve lost hope', 'The despondent monster stared at the rain.'],
+    ['crestfallen', 'suddenly sad and let down', 'Leo was crestfallen when the game was canceled.'],
+    ['dejected', 'sad and discouraged', 'The dejected team walked off the field.'],
+    ['forlorn', 'sad and left all alone', 'A forlorn puppy waited by the gate.'],
+    ['lonely', 'sad because you are alone', 'The lonely monster wished for a friend.'],
   ]},
 
   mad: { words: [
@@ -733,6 +822,12 @@ const WORDS = {
     ['enraged', 'filled with anger', 'The enraged monster smashed the fence.'],
     ['grouchy', 'in a bad, crabby mood', 'Grandpa Monster is grouchy in the morning.'],
     ['livid', 'extremely angry', 'The queen was livid about her broken crown.'],
+    ['irate', 'very angry', 'The irate troll stomped on his hat.'],
+    ['indignant', 'angry because you were treated unfairly', 'Mia was indignant when she was blamed.'],
+    ['exasperated', 'fed up and annoyed', 'The exasperated teacher sighed at the monster.'],
+    ['seething', 'angry inside but trying not to show it', 'Leo was seething but said nothing.'],
+    ['outraged', 'shocked and very angry', 'The monster was outraged when it lost its turn.'],
+    ['cross', 'a little angry', 'Grandma was cross about the muddy floor.'],
   ]},
 
   pretty: { words: [
@@ -745,6 +840,13 @@ const WORDS = {
     ['elegant', 'pretty in a fancy, graceful way', 'The elegant monster sipped tea with its pinky up.'],
     ['dazzling', 'so bright and pretty it almost hurts to look', 'The crown was covered in dazzling jewels.'],
     ['sparkling', 'shining with tiny flashes of light', 'The monster’s sparkling eyes glowed.'],
+    ['exquisite', 'extremely beautiful and delicate', 'The fairy wore an exquisite silver gown.'],
+    ['enchanting', 'so pretty it seems magical', 'The garden looked enchanting at night.'],
+    ['radiant', 'glowing and beautiful', 'The princess gave a radiant smile.'],
+    ['striking', 'so pretty you notice it right away', 'The monster had striking green eyes.'],
+    ['graceful', 'moving or looking smooth and pretty', 'The graceful swan glided past the monster.'],
+    ['picturesque', 'pretty enough to be in a painting', 'The monster lived in a picturesque valley.'],
+    ['delicate', 'pretty and easy to break', 'The monster held a delicate glass bird.'],
   ]},
 
   ugly: { words: [
@@ -757,6 +859,13 @@ const WORDS = {
     ['warty', 'covered in warts', 'A warty toad sat on the monster’s head.'],
     ['frightful', 'ugly enough to scare you', 'The witch wore a frightful mask.'],
     ['gnarly', 'twisted and knobby', 'The monster had gnarly, crooked fingers.'],
+    ['repulsive', 'so ugly it makes you pull away', 'The witch brewed a repulsive green potion.'],
+    ['gruesome', 'ugly in a horrible, shocking way', 'The zombie had a gruesome grin.'],
+    ['misshapen', 'twisted out of its normal shape', 'The witch carved a misshapen pumpkin.'],
+    ['beastly', 'ugly and nasty, like a beast', 'A beastly troll lived under the bridge.'],
+    ['slimy', 'covered in gross, slippery goo', 'A slimy creature crawled out of the pond.'],
+    ['crusty', 'covered with a hard, dry crust', 'The troll had crusty old toenails.'],
+    ['knobby', 'covered with bumps and knobs', 'The monster had knobby knees.'],
   ]},
 
   fast: { words: [
@@ -769,6 +878,13 @@ const WORDS = {
     ['brisk', 'quick and lively', 'We took a brisk walk past the monster’s cave.'],
     ['nimble', 'quick and light on your feet', 'The nimble monster tiptoed across the rocks.'],
     ['hurried', 'done fast because you are in a rush', 'Mia took a hurried look over her shoulder.'],
+    ['headlong', 'rushing forward fast and wild', 'The monster made a headlong dash for the door.'],
+    ['breakneck', 'dangerously fast', 'The sled raced down at breakneck speed.'],
+    ['fleet-footed', 'able to run very fast', 'The fleet-footed monster won every race.'],
+    ['hasty', 'done too fast, without care', 'The monster made a hasty escape.'],
+    ['high-speed', 'moving at a very fast speed', 'The monster rode a high-speed train.'],
+    ['zooming', 'moving super fast with a whoosh', 'A zooming rocket flew over the castle.'],
+    ['racing', 'moving very fast', 'Leo’s racing heart thumped in his chest.'],
   ]},
 
   slow: { words: [
@@ -781,6 +897,13 @@ const WORDS = {
     ['snail-like', 'as slow as a snail', 'The line moved at a snail-like pace.'],
     ['lazy', 'not wanting to move or work', 'A lazy monster napped all afternoon.'],
     ['creeping', 'moving slowly and quietly', 'A creeping fog rolled over the hill.'],
+    ['ponderous', 'slow and heavy', 'The ponderous elephant swayed down the road.'],
+    ['languid', 'slow and relaxed, without much energy', 'The monster took a languid stroll in the sun.'],
+    ['deliberate', 'slow and careful, on purpose', 'Leo took deliberate steps across the ice.'],
+    ['lumbering', 'moving in a slow, heavy, clumsy way', 'The lumbering giant shook the floor.'],
+    ['dawdling', 'wasting time and moving slowly', 'The dawdling monster was late for school.'],
+    ['lingering', 'staying a long time, slow to leave', 'A lingering smell of smoke filled the cave.'],
+    ['lagging', 'falling behind the others', 'The lagging monster huffed up the hill.'],
   ]},
 
   loud: { words: [
@@ -793,6 +916,13 @@ const WORDS = {
     ['rowdy', 'loud and wild', 'The rowdy monsters jumped on the beds.'],
     ['piercing', 'high and sharp enough to hurt your ears', 'A piercing whistle echoed through the cave.'],
     ['rumbling', 'deep and shaking', 'We heard a rumbling sound under the floor.'],
+    ['cacophonous', 'full of loud, clashing sounds', 'The cacophonous band woke the whole cave.'],
+    ['resounding', 'loud enough to echo', 'The door shut with a resounding bang.'],
+    ['raucous', 'loud, harsh, and wild', 'The raucous crows woke the monster.'],
+    ['boisterous', 'noisy, wild, and full of energy', 'The boisterous monsters wrestled in the yard.'],
+    ['shrill', 'high, sharp, and loud', 'The monster’s shrill whistle hurt our ears.'],
+    ['roaring', 'loud and deep, like a lion', 'The roaring fire crackled in the cave.'],
+    ['clanging', 'loud like metal banging', 'The monster’s clanging pots woke everyone.'],
   ]},
 
   quiet: { words: [
@@ -805,6 +935,13 @@ const WORDS = {
     ['calm', 'quiet and relaxed', 'The calm monster floated on the lake.'],
     ['whispery', 'soft like a whisper', 'The ghost had a whispery voice.'],
     ['soundless', 'with no sound at all', 'The monster took soundless steps across the rug.'],
+    ['tranquil', 'calm and peaceful', 'The monster rested by the tranquil pond.'],
+    ['serene', 'calm, quiet, and peaceful', 'The lake looked serene at sunrise.'],
+    ['inaudible', 'too quiet to hear', 'The monster’s whisper was almost inaudible.'],
+    ['muted', 'softer and quieter than usual', 'The snow made every sound muted.'],
+    ['taciturn', 'not talking much', 'The taciturn monster nodded but said nothing.'],
+    ['faint', 'so quiet you can barely hear it', 'A faint knock came from the closet.'],
+    ['speechless', 'so surprised you can’t say a word', 'Mia was speechless when the monster bowed.'],
   ]},
 
   cold: { senses: [
@@ -816,6 +953,11 @@ const WORDS = {
       ['frozen', 'turned hard from the cold', 'The monster skated on the frozen pond.'],
       ['bitter', 'painfully cold', 'The bitter wind stung our faces.'],
       ['frigid', 'extremely cold', 'The frigid water made the monster shiver.'],
+      ['glacial', 'as cold as a glacier', 'A glacial wind swept the mountain.'],
+      ['arctic', 'as cold as the North Pole', 'The monster lived in an arctic cave.'],
+      ['wintry', 'cold like winter', 'A wintry wind howled outside.'],
+      ['nippy', 'cold enough to nip your nose', 'It was a nippy morning.'],
+      ['crisp', 'cold and fresh', 'We walked in the crisp autumn air.'],
     ]},
     { label: 'unfriendly', icon: '😒', words: [
       ['unfriendly', 'not nice or welcoming', 'The unfriendly troll slammed the door.'],
@@ -824,6 +966,10 @@ const WORDS = {
       ['stony', 'hard and showing no feelings', 'The guard kept a stony face.'],
       ['distant', 'acting far away and not friendly', 'The new monster seemed distant.'],
       ['heartless', 'having no kindness at all', 'The heartless giant laughed at the crying kids.'],
+      ['aloof', 'distant and not friendly', 'The aloof cat ignored everyone.'],
+      ['standoffish', 'acting cold and keeping away', 'The new kid seemed standoffish at first.'],
+      ['unwelcoming', 'not making you feel wanted', 'The castle felt unwelcoming.'],
+      ['snooty', 'acting better than others', 'The snooty cat ignored the monster.'],
     ]},
   ]},
 
@@ -837,6 +983,11 @@ const WORDS = {
       ['sweltering', 'hot and sticky', 'It was a sweltering day at the beach.'],
       ['burning', 'on fire or very hot', 'The burning sand made the monster hop.'],
       ['toasty', 'nice and warm', 'The monster’s fur kept Leo toasty.'],
+      ['scalding', 'hot enough to burn your skin', 'The scalding tea burned the monster’s tongue.'],
+      ['searing', 'hot enough to burn', 'The searing sand burned our feet.'],
+      ['roasting', 'very hot, like being cooked', 'The tent was roasting by noon.'],
+      ['baking', 'hot like an oven', 'The baking sun beat down.'],
+      ['red-hot', 'so hot it glows red', 'The blacksmith pulled out red-hot metal.'],
     ]},
     { label: 'spicy', icon: '🌶️', words: [
       ['spicy', 'full of flavor that burns your mouth', 'The monster loved spicy tacos.'],
@@ -844,6 +995,11 @@ const WORDS = {
       ['peppery', 'tasting like lots of pepper', 'The peppery soup made the monster sneeze.'],
       ['zesty', 'full of strong, lively flavor', 'The monster dipped chips in zesty salsa.'],
       ['tingly', 'making your mouth tingle', 'The tingly candy fizzed on the monster’s tongue.'],
+      ['piquant', 'pleasantly spicy and sharp', 'The chef made a piquant sauce.'],
+      ['zingy', 'spicy and full of zing', 'The monster loved zingy chips.'],
+      ['tangy', 'with a strong, sour-sweet taste', 'The monster sipped tangy lemonade.'],
+      ['sharp', 'with a strong, biting taste', 'The cheese had a sharp taste.'],
+      ['burning', 'so spicy it burns your tongue', 'The burning sauce made the monster cough.'],
     ]},
   ]},
 
@@ -858,6 +1014,12 @@ const WORDS = {
     ['quirky', 'different in a fun way', 'The quirky monster collected spoons.'],
     ['freaky', 'weird in a creepy way', 'The freaky doll blinked at us.'],
     ['funky', 'strange in a fun or smelly way', 'A funky smell came from the fridge.'],
+    ['eccentric', 'odd in a harmless, interesting way', 'The eccentric monster wore a teapot hat.'],
+    ['surreal', 'strange, like a dream', 'Floating fish made the cave feel surreal.'],
+    ['uncanny', 'strange in a way that feels spooky', 'The doll looked uncanny, almost alive.'],
+    ['outlandish', 'very strange and hard to believe', 'The monster told an outlandish story.'],
+    ['zany', 'wild and silly', 'The monster had a zany idea.'],
+    ['kooky', 'strange in a fun, goofy way', 'The kooky monster wore socks on its ears.'],
   ]},
 
   old: { senses: [
@@ -870,6 +1032,12 @@ const WORDS = {
       ['antique', 'old and special, from long ago', 'Grandma kept an antique clock.'],
       ['tattered', 'old and torn into rags', 'A tattered flag flapped in the wind.'],
       ['creaky', 'old and squeaky when it moves', 'We climbed the creaky stairs.'],
+      ['decrepit', 'old and falling apart', 'The monster lived in a decrepit shack.'],
+      ['dilapidated', 'old and broken down', 'A dilapidated barn leaned in the wind.'],
+      ['weathered', 'worn by wind and rain', 'The sailor’s weathered map was hard to read.'],
+      ['rickety', 'old, wobbly, and about to break', 'We crossed a rickety bridge.'],
+      ['faded', 'lighter in color from age', 'Mia found a faded photo.'],
+      ['shabby', 'old and worn from lots of use', 'The monster wore a shabby coat.'],
     ]},
     { label: 'a person', icon: '👵', words: [
       ['elderly', 'old, used for people', 'An elderly monster sat on the porch.'],
@@ -878,6 +1046,11 @@ const WORDS = {
       ['wrinkly', 'covered in wrinkles', 'The wrinkly old monster smiled.'],
       ['ancient', 'very, very old', 'The ancient dragon was a thousand years old.'],
       ['wise', 'smart from living a long time', 'The wise old owl gave Mia advice.'],
+      ['venerable', 'old and deeply respected', 'The venerable wizard led the meeting.'],
+      ['wizened', 'old and wrinkled', 'A wizened witch stirred her pot.'],
+      ['grizzled', 'with rough gray hair from age', 'A grizzled sailor told sea monster tales.'],
+      ['silver-haired', 'with shiny gray or white hair', 'A silver-haired lady fed the ducks.'],
+      ['senior', 'older than others', 'The senior monster led the parade.'],
     ]},
   ]},
 
@@ -890,6 +1063,12 @@ const WORDS = {
       ['amusing', 'making you smile or laugh', 'Mia found the monster’s dance amusing.'],
       ['hysterical', 'so funny you laugh like crazy', 'The pie fight was hysterical.'],
       ['witty', 'funny in a clever way', 'The witty monster always had a joke ready.'],
+      ['absurd', 'so silly it makes no sense', 'The monster had an absurd idea to paint the moon.'],
+      ['whimsical', 'playful in an odd, fun way', 'Mia drew a whimsical monster with polka dots.'],
+      ['ridiculous', 'so silly it’s hard to believe', 'The monster wore a ridiculous hat.'],
+      ['comedic', 'meant to make people laugh', 'The play had a comedic ending.'],
+      ['side-splitting', 'so funny your sides hurt', 'The clown was side-splitting.'],
+      ['playful', 'full of fun and jokes', 'The playful monster tickled Leo.'],
     ]},
     { label: 'strange', icon: '🤔', words: [
       ['strange', 'not normal or usual', 'A strange noise came from the attic.'],
@@ -898,6 +1077,11 @@ const WORDS = {
       ['curious', 'strange and making you want to know more', 'A curious light blinked in the attic.'],
       ['fishy', 'strange in a way that seems not right', 'Something fishy was going on in the cave.'],
       ['mysterious', 'strange and hard to explain', 'A mysterious box sat on the doorstep.'],
+      ['inexplicable', 'impossible to explain', 'An inexplicable glow came from the closet.'],
+      ['bizarre', 'really, really strange', 'Mia found a bizarre egg with polka dots.'],
+      ['suspicious', 'seeming like something sneaky is going on', 'A suspicious trail of crumbs led to the monster’s bed.'],
+      ['unusual', 'not common; different from normal', 'The monster made an unusual sound, like a squeaky door.'],
+      ['puzzling', 'strange and hard to understand', 'The missing socks were puzzling.'],
     ]},
   ]},
 
@@ -911,6 +1095,13 @@ const WORDS = {
     ['intelligent', 'able to learn and think well', 'The intelligent monster solved the puzzle.'],
     ['gifted', 'born with a special talent', 'The gifted monster could paint with its tail.'],
     ['genius', 'amazingly smart', 'Building a slime cannon was a genius plan!'],
+    ['ingenious', 'very clever at inventing things', 'The monster built an ingenious trap.'],
+    ['astute', 'quick to understand what’s really going on', 'The astute detective spotted the fake mustache.'],
+    ['shrewd', 'smart at seeing what will help you', 'The shrewd monster traded one marble for three.'],
+    ['resourceful', 'good at finding ways to solve problems', 'Resourceful Mia used her shoelace as a rope.'],
+    ['observant', 'good at noticing things', 'The observant monster spotted the hidden key.'],
+    ['quick-witted', 'able to think fast', 'The quick-witted monster solved the riddle.'],
+    ['knowledgeable', 'knowing a lot about something', 'The knowledgeable owl knew every star.'],
   ]},
 
   dark: { words: [
@@ -923,6 +1114,13 @@ const WORDS = {
     ['shady', 'dark and cool, out of the sun', 'The monster napped in a shady spot.'],
     ['moonless', 'dark with no moon in the sky', 'It was a moonless night.'],
     ['unlit', 'with no lights on', 'We tiptoed down the unlit stairs.'],
+    ['somber', 'dark and serious', 'The cave had somber gray walls.'],
+    ['dusky', 'dim, like the start of night', 'Bats flew in the dusky sky.'],
+    ['starless', 'with no stars in the sky', 'The monster flew through the starless night.'],
+    ['overcast', 'covered with gray clouds', 'The sky was overcast and gloomy.'],
+    ['dismal', 'dark, gloomy, and sad', 'The monster lived in a dismal swamp.'],
+    ['sunless', 'with no sunlight at all', 'The cave was sunless and cold.'],
+    ['coal-black', 'as black as coal', 'The monster had coal-black fur.'],
   ]},
 
   tired: { words: [
@@ -934,6 +1132,14 @@ const WORDS = {
     ['drained', 'all used up, like a battery', 'Leo felt drained after the big test.'],
     ['droopy', 'tired and sagging', 'The monster’s droopy eyes began to close.'],
     ['groggy', 'sleepy and foggy, like you just woke up', 'The groggy monster bumped into the wall.'],
+    ['fatigued', 'very tired from hard work', 'The fatigued monster sat down on a rock.'],
+    ['lethargic', 'tired and slow, with no energy', 'The heat made the monster lethargic.'],
+    ['listless', 'too tired to care about anything', 'The listless monster stared at the wall.'],
+    ['sluggish', 'slow and low on energy', 'The monster felt sluggish after lunch.'],
+    ['bleary-eyed', 'with sleepy, blurry eyes', 'The bleary-eyed monster stumbled to breakfast.'],
+    ['spent', 'so tired you have nothing left', 'After the race, Leo was spent.'],
+    ['run-down', 'tired and a little sick', 'Mia felt run-down after her cold.'],
+    ['yawning', 'opening your mouth wide because you’re sleepy', 'The yawning monster rubbed its eyes.'],
   ]},
 
   strong: { words: [
@@ -946,6 +1152,13 @@ const WORDS = {
     ['brawny', 'big and full of muscles', 'The brawny monster chopped wood all day.'],
     ['unbreakable', 'too strong to break', 'The monster’s cage was unbreakable.'],
     ['rugged', 'tough and built for hard work', 'Mia’s rugged boots crossed the rocky hill.'],
+    ['formidable', 'strong enough to make others nervous', 'The formidable knight guarded the gate.'],
+    ['invincible', 'too strong to be beaten', 'The monster felt invincible in its armor.'],
+    ['herculean', 'as strong as the hero Hercules', 'It took a herculean push to move the boulder.'],
+    ['robust', 'strong and healthy', 'The robust monster never caught a cold.'],
+    ['hardy', 'strong enough to handle hard times', 'Hardy plants grew on the monster’s mountain.'],
+    ['strapping', 'tall, strong, and healthy', 'The strapping knight rode into town.'],
+    ['forceful', 'using a lot of strength', 'The monster gave the door a forceful push.'],
   ]},
 
   smelly: { words: [
@@ -957,6 +1170,14 @@ const WORDS = {
     ['funky', 'smelling strange', 'Leo’s gym bag had a funky smell.'],
     ['pungent', 'having a strong, sharp smell', 'The monster cooked pungent onion soup.'],
     ['rotten', 'smelling like spoiled food', 'The fridge smelled like rotten eggs.'],
+    ['rancid', 'smelling like old, spoiled food', 'The rancid butter made the monster gag.'],
+    ['fetid', 'smelling rotten and gross', 'A fetid swamp bubbled nearby.'],
+    ['noxious', 'smelly in a harmful way', 'Noxious fumes rose from the cauldron.'],
+    ['stale', 'smelling old and not fresh', 'The cave smelled stale and dusty.'],
+    ['sour', 'smelling sharp, like old milk', 'A sour smell came from the lunchbox.'],
+    ['skunky', 'smelling like a skunk', 'The monster came home skunky and sad.'],
+    ['ripe', 'smelling strong, like old food', 'The monster’s socks were pretty ripe.'],
+    ['garlicky', 'smelling strongly of garlic', 'The vampire hated the garlicky soup.'],
   ]},
 
   said: { forms: 'say says saying', words: [
@@ -972,6 +1193,10 @@ const WORDS = {
     ['giggled', 'said with a little laugh', '“That tickles!” the monster giggled.'],
     ['stammered', 'said in a nervous, stop-and-start way', '“I-I-I didn’t do it,” Leo stammered.'],
     ['explained', 'said how or why something works', '“Monsters only come out at night,” Mia explained.'],
+    ['retorted', 'said back quickly and sharply', '“Not likely!” the monster retorted.'],
+    ['murmured', 'said very softly', '“Goodnight,” Mia murmured.'],
+    ['hissed', 'said in a sharp whisper', '“Get down!” Leo hissed.'],
+    ['sighed', 'said with a long, tired breath', '“Fine,” the monster sighed.'],
   ]},
 
   went: { forms: 'go goes going gone', words: [
@@ -985,6 +1210,12 @@ const WORDS = {
     ['rushed', 'went in a big hurry', 'The monster rushed to the rescue.'],
     ['zoomed', 'went super fast', 'The monster zoomed past on a skateboard.'],
     ['ventured', 'went somewhere new and a little risky', 'Mia ventured into the cave.'],
+    ['meandered', 'went slowly, winding around', 'We meandered through the market.'],
+    ['embarked', 'set off on a trip', 'The monsters embarked on a quest.'],
+    ['proceeded', 'went forward', 'The knight proceeded across the bridge.'],
+    ['trekked', 'went on a long, hard walk', 'We trekked through the snowy forest.'],
+    ['roamed', 'went around from place to place', 'The monster roamed the hills.'],
+    ['departed', 'went away; left', 'The monster departed before sunrise.'],
   ]},
 
   walked: { forms: 'walk walks walking', words: [
@@ -1000,6 +1231,10 @@ const WORDS = {
     ['strutted', 'walked proudly, showing off', 'The monster strutted in its new sneakers.'],
     ['waddled', 'walked with short steps, rocking side to side', 'The round little monster waddled like a duck.'],
     ['hiked', 'took a long walk in nature', 'We hiked up Monster Mountain.'],
+    ['sauntered', 'walked slowly and confidently', 'The cat sauntered past the monster.'],
+    ['ambled', 'walked in a slow, relaxed way', 'The monster ambled down the beach.'],
+    ['plodded', 'walked slowly with heavy steps', 'The tired monster plodded home.'],
+    ['staggered', 'walked as if you might fall', 'The dizzy monster staggered off the ride.'],
   ]},
 
   ran: { forms: 'run runs running', words: [
@@ -1014,6 +1249,11 @@ const WORDS = {
     ['fled', 'ran away from danger', 'The villagers fled when they saw the dragon.'],
     ['zoomed', 'ran super fast', 'The monster zoomed around the track.'],
     ['charged', 'ran hard right at something', 'The monster charged at the door.'],
+    ['hurtled', 'ran super fast, almost out of control', 'The monster hurtled down the hill.'],
+    ['scuttled', 'ran with short, quick steps', 'The crab scuttled under a rock.'],
+    ['stampeded', 'ran wildly in a big group', 'The monsters stampeded to the snack table.'],
+    ['scrambled', 'ran fast in a messy way', 'The kids scrambled up the hill.'],
+    ['jogged', 'ran at a slow, steady speed', 'Mia jogged around the park.'],
   ]},
 
   looked: { forms: 'look looks looking', words: [
@@ -1027,6 +1267,12 @@ const WORDS = {
     ['gawked', 'stared with your mouth hanging open', 'Everyone gawked at the dancing monster.'],
     ['examined', 'looked very carefully at every part', 'Leo examined the strange slime.'],
     ['searched', 'looked everywhere for something', 'We searched the attic for the monster.'],
+    ['scrutinized', 'looked at very, very closely', 'The detective scrutinized the footprint.'],
+    ['inspected', 'looked closely to check something', 'The monster inspected its teeth in the mirror.'],
+    ['surveyed', 'looked over a whole area', 'The monster surveyed the town from the hill.'],
+    ['scanned', 'looked quickly over a big area', 'Mia scanned the crowd for her friend.'],
+    ['gaped', 'stared in surprise with your mouth open', 'We gaped at the giant footprint.'],
+    ['eyed', 'looked at something with interest', 'The monster eyed the last cupcake.'],
   ]},
 
   saw: { forms: 'see sees seeing seen', words: [
@@ -1039,6 +1285,13 @@ const WORDS = {
     ['observed', 'watched carefully', 'Leo observed the monster eating lunch.'],
     ['discovered', 'found or saw for the first time', 'We discovered a hidden monster cave.'],
     ['recognized', 'saw and knew who it was', 'Mia recognized the monster from her dream.'],
+    ['discerned', 'noticed something hard to see', 'Mia discerned a shape in the fog.'],
+    ['perceived', 'noticed with your senses', 'Leo perceived a faint glow in the attic.'],
+    ['beheld', 'saw something amazing (an old word)', 'Mia beheld a glowing castle.'],
+    ['sighted', 'saw something you were looking for', 'The sailors sighted a sea monster.'],
+    ['detected', 'found something that was hard to notice', 'Leo detected a tiny footprint.'],
+    ['encountered', 'came across by surprise', 'We encountered a monster on the trail.'],
+    ['caught', 'saw something for a quick moment', 'I caught a glimpse of purple fur.'],
   ]},
 
   got: { forms: 'get gets getting gotten', senses: [
@@ -1050,12 +1303,20 @@ const WORDS = {
       ['found', 'got something you were looking for', 'Leo found the lost key.'],
       ['fetched', 'went and brought something back', 'The monster fetched a bucket of water.'],
       ['gathered', 'got things and brought them together', 'We gathered sticks for the fire.'],
+      ['acquired', 'got or gained something', 'The monster acquired a rare stamp.'],
+      ['obtained', 'got something after trying', 'Leo obtained a library card.'],
+      ['bought', 'got something by paying for it', 'Leo bought a monster mask.'],
+      ['gained', 'got more of something', 'The monster gained a new friend.'],
+      ['scored', 'got points or something good', 'Mia scored a goal.'],
     ]},
     { label: 'became', icon: '🔄', words: [
       ['became', 'started to be', 'The sky became dark.'],
       ['grew', 'slowly became', 'The monster grew sleepy.'],
       ['turned', 'changed into', 'Leo’s face turned pale.'],
       ['felt', 'had a feeling', 'Mia felt nervous.'],
+      ['fell', 'suddenly became', 'The room fell silent.'],
+      ['went', 'changed to', 'The monster’s face went red.'],
+      ['started', 'began to', 'Mia started to worry.'],
     ]},
   ]},
 
@@ -1071,6 +1332,11 @@ const WORDS = {
     ['chewed', 'mashed food with your teeth', 'The monster chewed its gum loudly.'],
     ['feasted', 'ate a big, special meal', 'The monsters feasted on pie and pudding.'],
     ['snacked', 'ate a little food between meals', 'Mia snacked on popcorn.'],
+    ['consumed', 'ate or used up', 'The monster consumed six pies.'],
+    ['wolfed', 'ate super fast, like a hungry wolf', 'Leo wolfed down his sandwich.'],
+    ['gnawed', 'chewed on something for a long time', 'The monster gnawed on a bone.'],
+    ['dined', 'ate a nice meal', 'The monsters dined by candlelight.'],
+    ['swallowed', 'sent food down your throat', 'The monster swallowed the grape whole.'],
   ]},
 
   made: { forms: 'make makes making', words: [
@@ -1084,6 +1350,12 @@ const WORDS = {
     ['baked', 'cooked in an oven', 'Mia baked cookies for the monster.'],
     ['shaped', 'made into a certain form', 'The monster shaped the snow into a castle.'],
     ['assembled', 'put the pieces together', 'Leo assembled the robot.'],
+    ['fashioned', 'made with your hands', 'Leo fashioned a sword from cardboard.'],
+    ['sculpted', 'shaped carefully from clay or stone', 'Mia sculpted a monster out of clay.'],
+    ['devised', 'planned or invented', 'The monster devised a clever plan.'],
+    ['concocted', 'mixed together something new', 'The witch concocted a bubbly potion.'],
+    ['prepared', 'made something ready', 'The monster prepared a picnic.'],
+    ['sewed', 'made with a needle and thread', 'Mia sewed a cape for the monster.'],
   ]},
 
   liked: { forms: 'like likes liking', words: [
@@ -1095,6 +1367,14 @@ const WORDS = {
     ['cherished', 'loved and took care of', 'She cherished the monster’s drawing.'],
     ['appreciated', 'was thankful for', 'The monster appreciated the warm blanket.'],
     ['craved', 'wanted very much', 'The monster craved chocolate.'],
+    ['revered', 'respected deeply', 'The village revered the wise old monster.'],
+    ['relished', 'really enjoyed', 'The monster relished every bite.'],
+    ['savored', 'enjoyed slowly', 'Mia savored the last cookie.'],
+    ['prized', 'thought of as very special', 'Leo prized his rock collection.'],
+    ['valued', 'thought of as important', 'The monster valued its friends.'],
+    ['favored', 'liked more than others', 'The monster favored the blue blanket.'],
+    ['preferred', 'liked one thing better', 'The monster preferred rainy days.'],
+    ['welcomed', 'was happy to have', 'The monster welcomed the cool breeze.'],
   ]},
 
   yelled: { forms: 'yell yells yelling', words: [
@@ -1107,6 +1387,13 @@ const WORDS = {
     ['howled', 'yelled with a long, wild cry', 'The monster howled at the moon.'],
     ['boomed', 'said in a deep, loud voice', '“Welcome!” the giant boomed.'],
     ['squealed', 'yelled in a high, happy or scared voice', 'The kids squealed with joy.'],
+    ['thundered', 'yelled in a booming voice', '“Who goes there?” the giant thundered.'],
+    ['clamored', 'yelled loudly as a group', 'The kids clamored for more cake.'],
+    ['barked', 'yelled in a short, sharp way', '“Sit down!” the coach barked.'],
+    ['screeched', 'yelled in a high, scratchy voice', 'The monster screeched when it saw the mouse.'],
+    ['cheered', 'yelled happily', 'The crowd cheered for the monster.'],
+    ['hooted', 'yelled with laughter', 'The kids hooted at the joke.'],
+    ['wailed', 'yelled with a long, sad cry', '“My ice cream!” the monster wailed.'],
   ]},
 
   cried: { forms: 'cry cries crying', words: [
@@ -1118,6 +1405,14 @@ const WORDS = {
     ['wailed', 'cried with a long, loud sound', 'The ghost wailed all night.'],
     ['blubbered', 'cried messily while trying to talk', '“I lost my hat!” the monster blubbered.'],
     ['moaned', 'made a long, sad sound', 'The lonely monster moaned in its cave.'],
+    ['lamented', 'cried out in sadness', 'The monster lamented its lost kite.'],
+    ['mourned', 'felt very sad about a loss', 'The monster mourned its lost goldfish.'],
+    ['grieved', 'felt deep sadness after a loss', 'The village grieved for the old tree.'],
+    ['howled', 'cried loudly and wildly', 'The baby monster howled for its teddy.'],
+    ['whined', 'cried in a high, complaining way', 'The puppy whined at the door.'],
+    ['sniveled', 'cried and sniffed in a weak way', 'The monster sniveled into a tissue.'],
+    ['boohooed', 'cried loudly (a silly word)', 'The giant boohooed over his broken toy.'],
+    ['fussed', 'cried and complained, like a baby', 'The baby monster fussed all night.'],
   ]},
 
   laughed: { forms: 'laugh laughs laughing', words: [
@@ -1130,6 +1425,13 @@ const WORDS = {
     ['chortled', 'laughed in a happy, bubbly way', 'The monster chortled with glee.'],
     ['guffawed', 'laughed loudly with your whole body', 'The giant guffawed so hard the ground shook.'],
     ['roared', 'laughed super loudly', 'The crowd roared at the monster’s silly hat.'],
+    ['convulsed', 'shook all over with laughter', 'The class convulsed with laughter.'],
+    ['tittered', 'laughed in a quick, nervous way', 'The students tittered when the monster burped.'],
+    ['whooped', 'laughed and cheered loudly', 'Leo whooped with delight.'],
+    ['wheezed', 'laughed so hard you could barely breathe', 'The monster wheezed at the joke.'],
+    ['hooted', 'laughed loudly', 'The kids hooted at the monster’s silly dance.'],
+    ['shrieked', 'laughed in a high, loud voice', 'Mia shrieked with laughter.'],
+    ['belly-laughed', 'laughed deep from your belly', 'Grandpa belly-laughed at the cartoon.'],
   ]},
 
   grabbed: { forms: 'grab grabs grabbing', words: [
@@ -1143,6 +1445,12 @@ const WORDS = {
     ['nabbed', 'grabbed and caught quickly', 'The monster nabbed the frisbee in midair.'],
     ['plucked', 'pulled off quickly', 'The monster plucked an apple from the tree.'],
     ['snagged', 'caught or grabbed quickly', 'Leo snagged the last slice of pizza.'],
+    ['wrenched', 'pulled away hard with a twist', 'Mia wrenched the sword from the stone.'],
+    ['clasped', 'held tightly with your hands', 'Mia clasped the monster’s paw.'],
+    ['clamped', 'held tight like a clamp', 'The crab clamped onto Leo’s toe.'],
+    ['pinched', 'grabbed with two fingers', 'The monster pinched a cookie from the plate.'],
+    ['latched', 'grabbed on and held tight', 'The baby monster latched onto Mia’s leg.'],
+    ['caught', 'grabbed something moving', 'The monster caught the ball.'],
   ]},
 
   jumped: { forms: 'jump jumps jumping', words: [
@@ -1156,6 +1464,12 @@ const WORDS = {
     ['dove', 'jumped in headfirst', 'Mia dove into the lake.'],
     ['hurdled', 'jumped over something while running', 'The monster hurdled the garden wall.'],
     ['flinched', 'jumped a little from being scared', 'Mia flinched at the loud bang.'],
+    ['catapulted', 'jumped as if shot into the air', 'The monster catapulted off the trampoline.'],
+    ['lunged', 'jumped forward suddenly', 'The monster lunged at the fly.'],
+    ['plunged', 'jumped down into something', 'The monster plunged into the pool.'],
+    ['soared', 'jumped or flew high', 'The monster soared over the fence.'],
+    ['skipped', 'jumped lightly from foot to foot', 'Mia skipped down the sidewalk.'],
+    ['jolted', 'jumped from a sudden shock', 'Leo jolted awake.'],
   ]},
 
   moved: { forms: 'move moves moving', words: [
@@ -1170,6 +1484,11 @@ const WORDS = {
     ['inched', 'moved very slowly, bit by bit', 'Mia inched toward the door.'],
     ['slithered', 'moved by sliding like a snake', 'Something slithered under the bed.'],
     ['lurched', 'moved with a sudden jerk', 'The bus lurched forward.'],
+    ['maneuvered', 'moved carefully around things', 'Mia maneuvered around the sleeping dragon.'],
+    ['swayed', 'moved slowly side to side', 'The trees swayed in the wind.'],
+    ['budged', 'moved just a tiny bit', 'The heavy door finally budged.'],
+    ['stirred', 'moved a little, often waking up', 'The sleeping monster stirred.'],
+    ['edged', 'moved slowly and carefully', 'Mia edged along the cliff.'],
   ]},
 
   hit: { forms: 'hits hitting', words: [
@@ -1183,6 +1502,12 @@ const WORDS = {
     ['pounded', 'hit over and over', 'The monster pounded on the door.'],
     ['bopped', 'hit lightly in a silly way', 'Mia bopped the monster on the nose.'],
     ['tapped', 'hit very lightly', 'Something tapped on the window.'],
+    ['pummeled', 'hit over and over with fists', 'The monster pummeled the punching bag.'],
+    ['walloped', 'hit really hard', 'The giant walloped the drum.'],
+    ['swatted', 'hit quickly to shoo something away', 'The monster swatted at the bee.'],
+    ['rammed', 'hit by running into it hard', 'The goat rammed the gate.'],
+    ['clobbered', 'hit hard and knocked down', 'The monster clobbered the tower of cans.'],
+    ['smashed', 'hit so hard it broke', 'The monster smashed the piñata.'],
   ]},
 
   fell: { forms: 'fall falls falling fallen', words: [
@@ -1196,6 +1521,12 @@ const WORDS = {
     ['slipped', 'slid and fell', 'The monster slipped on a banana peel.'],
     ['flopped', 'fell down in a loose, heavy way', 'Leo flopped onto his bed.'],
     ['plopped', 'fell with a soft, wet sound', 'The slime plopped onto the floor.'],
+    ['plummeted', 'fell fast from very high', 'The kite plummeted to the ground.'],
+    ['sprawled', 'fell and spread out flat', 'Leo sprawled on the grass.'],
+    ['slumped', 'fell down in a heavy, tired way', 'The monster slumped into its chair.'],
+    ['skidded', 'slid on a slippery spot', 'The monster skidded on the ice.'],
+    ['sank', 'fell slowly down', 'The boat sank in the swamp.'],
+    ['tipped', 'fell over to one side', 'The cup tipped over.'],
   ]},
 
   came: { forms: 'come comes coming', words: [
@@ -1208,6 +1539,13 @@ const WORDS = {
     ['burst', 'came in suddenly and with force', 'The monster burst through the door.'],
     ['neared', 'came close to', 'We neared the monster’s castle.'],
     ['visited', 'came to see someone', 'The monster visited Mia’s school.'],
+    ['materialized', 'suddenly appeared out of nowhere', 'A ghost materialized in the doorway.'],
+    ['descended', 'came down', 'The dragon descended from the clouds.'],
+    ['reached', 'finally got to a place', 'We reached the top of the hill.'],
+    ['landed', 'came down from the air', 'The spaceship landed in the yard.'],
+    ['drifted', 'came slowly, floating', 'Fog drifted into the valley.'],
+    ['crept', 'came slowly and quietly', 'A cat crept into the room.'],
+    ['popped', 'came quickly for a short visit', 'The monster popped in for tea.'],
   ]},
 
   put: { forms: 'puts putting', words: [
@@ -1221,6 +1559,12 @@ const WORDS = {
     ['stacked', 'put in a pile, one on top of another', 'Mia stacked the books high.'],
     ['slipped', 'put in quietly or secretly', 'The monster slipped a note under the door.'],
     ['hid', 'put where no one could find it', 'The monster hid the cookie jar.'],
+    ['deposited', 'put down carefully in a place', 'The monster deposited its coins in the jar.'],
+    ['positioned', 'put in an exact spot', 'Leo positioned the trap by the door.'],
+    ['stashed', 'put in a secret place', 'The monster stashed its candy under the bed.'],
+    ['propped', 'put something so it leans', 'Mia propped the door open.'],
+    ['plunked', 'put down with a thud', 'The monster plunked a pumpkin on the table.'],
+    ['inserted', 'put inside something', 'Leo inserted the key in the lock.'],
   ]},
 
   thought: { forms: 'think thinks thinking', words: [
@@ -1234,6 +1578,12 @@ const WORDS = {
     ['pondered', 'thought about something for a long time', 'The monster pondered the riddle.'],
     ['suspected', 'thought something might be true', 'Mia suspected the monster ate the pie.'],
     ['decided', 'made up your mind', 'Leo decided to follow the footprints.'],
+    ['contemplated', 'thought long and carefully', 'The monster contemplated the stars.'],
+    ['deduced', 'figured out using clues', 'Leo deduced who ate the pie.'],
+    ['concluded', 'decided after thinking', 'Mia concluded the monster was friendly.'],
+    ['considered', 'thought carefully about', 'The monster considered its choices.'],
+    ['assumed', 'thought something was true without checking', 'Leo assumed the cave was empty.'],
+    ['reflected', 'thought quietly about something', 'The monster reflected on its long day.'],
   ]},
 
   took: { forms: 'take takes taking taken', words: [
@@ -1247,6 +1597,12 @@ const WORDS = {
     ['swiped', 'took quickly and sneakily', 'The monster swiped a cookie from the jar.'],
     ['accepted', 'took something that was offered', 'The monster accepted the gift.'],
     ['removed', 'took away or off', 'The monster removed its hat.'],
+    ['confiscated', 'took away as a punishment', 'The teacher confiscated the monster’s slingshot.'],
+    ['pilfered', 'stole small things', 'The raccoon pilfered our snacks.'],
+    ['acquired', 'got something for your own', 'The monster acquired a new pet.'],
+    ['captured', 'took and held as a prisoner', 'The knight captured the dragon.'],
+    ['hauled', 'took by pulling hard', 'We hauled the sled up the hill.'],
+    ['claimed', 'took because you said it was yours', 'The monster claimed the top bunk.'],
   ]},
 
   asked: { forms: 'ask asks asking', words: [
@@ -1259,6 +1615,13 @@ const WORDS = {
     ['requested', 'asked for politely', 'The monster requested more pancakes.'],
     ['wondered', 'asked yourself', '“Where did it go?” Mia wondered.'],
     ['invited', 'asked someone to come', 'The monster invited us to its party.'],
+    ['implored', 'begged with great feeling', '“Please stay,” Mia implored.'],
+    ['interrogated', 'asked lots of tough questions', 'The detective interrogated the sneaky troll.'],
+    ['queried', 'asked a question', '“Where to?” the monster queried.'],
+    ['pestered', 'asked again and again in an annoying way', 'The monster pestered Mia for a snack.'],
+    ['urged', 'asked strongly, trying to convince', 'Leo urged the monster to be brave.'],
+    ['probed', 'asked questions to find out more', 'The reporter probed for answers.'],
+    ['interviewed', 'asked someone lots of questions', 'Mia interviewed the monster for the school paper.'],
   ]},
 
   talked: { forms: 'talk talks talking', words: [
@@ -1272,6 +1635,12 @@ const WORDS = {
     ['spoke', 'said words out loud', 'The monster finally spoke.'],
     ['whispered', 'talked very softly', 'We whispered so the monster wouldn’t hear.'],
     ['explained', 'talked to help someone understand', 'Leo explained the plan.'],
+    ['conversed', 'talked back and forth', 'The two monsters conversed quietly.'],
+    ['debated', 'talked about different sides of an idea', 'The monsters debated the best pizza topping.'],
+    ['boasted', 'talked proudly about yourself', 'The monster boasted about its big muscles.'],
+    ['prattled', 'talked on and on about silly things', 'The monster prattled on about its socks.'],
+    ['jabbered', 'talked fast and excitedly', 'The monsters jabbered all through lunch.'],
+    ['lectured', 'talked a long time to teach or scold', 'The teacher lectured the monster about running.'],
   ]},
 };
 
@@ -1310,6 +1679,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const speechOK = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 const TIMEOUT_MS = 3000;
+const WHEEL_MAX = 16;
 
 function h(tag, props = {}, ...kids) {
   const el = document.createElement(tag);
@@ -1416,6 +1786,9 @@ function closeMatches(word) {
    Saved lookups (localStorage)
    ===================================================================== */
 const PREFIX = 'ys:';
+// Bump these when saved lookups change shape or quality, so older ones are ignored.
+const SYN = 'syn2:';
+const DEF = 'def2:';
 const store = {
   get(k) {
     try {
@@ -1471,7 +1844,14 @@ async function request(url, signal) {
 const POS_TAGS = ['n', 'v', 'adj', 'adv'];
 const POS_NAMES = { n: 'noun', v: 'verb', adj: 'adjective', adv: 'adverb' };
 
-function filterResults(list, word) {
+// "-ing" and "-ed" words usually want answers in the same form: dancing → twirling, giggled → snickered.
+function wordEnding(w) {
+  if (w.length >= 6 && w.endsWith('ing') && /[aeiouy]/.test(w.slice(0, -3))) return 'ing';
+  if (w.length >= 5 && w.endsWith('ed') && !w.endsWith('eed') && /[aeiouy]/.test(w.slice(0, -2))) return 'ed';
+  return null;
+}
+
+function filterResults(list, word, ending) {
   const out = [];
   for (const r of list || []) {
     const w = String(r.word || '').toLowerCase();
@@ -1479,7 +1859,9 @@ function filterResults(list, word) {
     if (stemCandidates(w).includes(word) || stemCandidates(word).includes(w)) continue;
     const tags = r.tags || [];
     const freq = tags.find(t => t.startsWith('f:'));
-    if (!freq || parseFloat(freq.slice(2)) < 2) continue;
+    // "twirling" is far rarer than "twirl", so same-ending matches get a lower bar.
+    const floor = ending && wordEnding(w) === ending ? 0.2 : 2;
+    if (!freq || parseFloat(freq.slice(2)) < floor) continue;
     out.push({ w, tags: tags.filter(t => POS_TAGS.includes(t)), defs: r.defs || [] });
   }
   return out;
@@ -1508,21 +1890,32 @@ async function lookupOnline(word) {
     const me = self.ok && Array.isArray(self.data) ? self.data.find(r => r.word === word) : null;
     const pos = me ? (me.tags || []).find(t => POS_TAGS.includes(t)) || null : null;
 
-    let results = filterResults(syn.data, word);
-    if (results.length < 4) {
+    const ending = wordEnding(word);
+    const matching = list => ending ? list.filter(r => wordEnding(r.w) === ending) : list;
+    let results = filterResults(syn.data, word, ending);
+    if (matching(results).length < 4) {
       const ml = await mlP;
-      if (ml.ok) results = mergeResults(results, filterResults(ml.data, word));
+      if (ml.ok) results = mergeResults(results, filterResults(ml.data, word, ending));
     }
-    if (results.length < 4) {
+    if (matching(results).length < 4) {
       const trg = await trgP;
-      if (trg.ok) results = mergeResults(results, filterResults(trg.data, word));
+      if (trg.ok) results = mergeResults(results, filterResults(trg.data, word, ending));
     }
-    if (pos) {
-      const same = results.filter(r => r.tags.includes(pos));
-      results = same.length >= 4 ? same : same.concat(results.filter(r => !r.tags.includes(pos)));
+    if (ending) {
+      // Keep both groups; showOnlineResults() decides whether to offer a choice between them.
+      const same = matching(results);
+      results = same.slice(0, WHEEL_MAX).concat(results.filter(r => !same.includes(r)).slice(0, WHEEL_MAX));
+    } else {
+      if (pos) {
+        const same = results.filter(r => r.tags.includes(pos));
+        results = same.length >= 4 ? same : same.concat(results.filter(r => !r.tags.includes(pos)));
+      }
+      results = results.slice(0, WHEEL_MAX);
     }
-    results = results.slice(0, 16).map(r => {
-      const rPos = r.tags.includes(pos) ? pos : r.tags[0] || pos;
+    results = results.map(r => {
+      // Same-ending matches are verbs here, even when Datamuse files them as nouns ("twirling").
+      const rPos = ending && wordEnding(r.w) === ending ? (pos === 'adj' ? 'adj' : 'v')
+        : r.tags.includes(pos) ? pos : r.tags[0] || pos;
       return { w: r.w, pos: rPos, alt: backupDefinition(r.defs, rPos) };
     });
     return { status: results.length ? 'found' : 'none', results, pos };
@@ -1537,9 +1930,12 @@ function firstSentence(text) {
   return asSentence(m ? m[0] : clean);
 }
 
+// Entries like "Present participle of prance." tell a kid nothing, so they're skipped.
+const GRAMMAR_NOTE = /\b(participle|past tense|simple past|plural|third-person|comparative|superlative)\b.*\bof\b/i;
+
 // Datamuse definitions look like "adj\tHaving a smooth, reflective surface."
 function backupDefinition(defs, pos) {
-  const parsed = defs.map(d => String(d).split('\t')).filter(d => d.length === 2 && d[1].trim());
+  const parsed = defs.map(d => String(d).split('\t')).filter(d => d.length === 2 && d[1].trim() && !GRAMMAR_NOTE.test(d[1]));
   const match = parsed.find(([p]) => p === pos) || parsed[0];
   return match ? firstSentence(match[1]) : null;
 }
@@ -1547,10 +1943,12 @@ function backupDefinition(defs, pos) {
 function pickDefinition(entries, pos) {
   const meanings = entries.flatMap(e => e.meanings || []);
   const want = POS_NAMES[pos];
-  const m = (want && meanings.find(x => x.partOfSpeech === want)) || meanings[0];
-  const def = m && m.definitions && m.definitions[0];
-  if (!def || !def.definition) return { d: null };
-  return { d: firstSentence(def.definition), e: def.example ? firstSentence(def.example) : null };
+  const ordered = meanings.filter(m => m.partOfSpeech === want).concat(meanings.filter(m => m.partOfSpeech !== want));
+  for (const m of ordered) {
+    const def = (m.definitions || []).find(d => d.definition && !GRAMMAR_NOTE.test(d.definition));
+    if (def) return { d: firstSentence(def.definition), e: def.example ? firstSentence(def.example) : null };
+  }
+  return { d: null };
 }
 
 const defInFlight = new Map();
@@ -1558,7 +1956,7 @@ const defFailedAt = new Map();
 
 // Resolves to { d, e } (d is null when the dictionary has no entry), or undefined when it couldn't be reached.
 function getDefinition(word, pos) {
-  const cached = store.get('def:' + word);
+  const cached = store.get(DEF + word);
   if (cached !== undefined) return Promise.resolve(cached);
   if (defInFlight.has(word)) return defInFlight.get(word);
   // Don't make the kid wait through a second timeout right after one just failed.
@@ -1580,7 +1978,7 @@ function getDefinition(word, pos) {
       return undefined;
     }
     const def = r.status === 200 && Array.isArray(r.data) ? pickDefinition(r.data, pos) : { d: null };
-    store.set('def:' + word, def);
+    store.set(DEF + word, def);
     return def;
   })();
   defInFlight.set(word, p);
@@ -1661,7 +2059,8 @@ const stopSpeech = () => { if (speechOK) speechSynthesis.cancel(); };
 /* =====================================================================
    Wheel
    ===================================================================== */
-const SEG_COLORS = ['#FF8A80', '#FFD43B', '#69DB7C', '#74C0FC', '#B197FC', '#FFA94D', '#63E6BE', '#F783AC', '#A9E34B', '#91A7FF'];
+// 16 colors so a full wheel never repeats one; neighbors are picked to contrast, including the wrap-around.
+const SEG_COLORS = ['#FF8A80', '#FFD43B', '#69DB7C', '#74C0FC', '#B197FC', '#FFA94D', '#63E6BE', '#F783AC', '#A9E34B', '#91A7FF', '#3BC9DB', '#FFC078', '#DA77F2', '#FFE066', '#A5D8FF', '#8CE99A'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const C = 200, R = 186;
 
@@ -1723,7 +2122,7 @@ class Wheel {
         this.rotor.append(svg('path', { class: 'seg', fill, d: `M${C} ${C} L${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1} Z` }));
       }
       // Radial label; orientLabels() points it whichever way reads upright.
-      const room = R * 0.86 - 40;
+      const room = R * 0.8 - 40;
       const size = Math.max(12, Math.min(28, room / (label.length * 0.6), n > 1 ? (Math.PI * R * 0.55 * 2 / n) * 0.42 : 28));
       const text = svg('text', { class: 'seg-label', y: 0, 'dominant-baseline': 'central', 'font-size': size.toFixed(1) });
       text.textContent = label;
@@ -1748,7 +2147,8 @@ class Wheel {
     $$('.seg-label', this.rotor).forEach((text, i) => {
       const mid = (i + 0.5) * seg;
       const flip = mod(mid + this.angle, 360) > 180;
-      text.setAttribute('x', (flip ? -R : R) * 0.86);
+      // Stop short of the rim so the pointer never covers the word that won.
+      text.setAttribute('x', (flip ? -R : R) * 0.8);
       text.setAttribute('text-anchor', flip ? 'start' : 'end');
       text.setAttribute('transform', `translate(${C} ${C}) rotate(${mid - 90 + (flip ? 180 : 0)})`);
     });
@@ -1912,7 +2312,7 @@ const wordHint = $('#word-hint');
 const views = $$('#word [data-view]');
 let lookupToken = 0;
 let wheelItems = [];
-let currentSenseKey = null;
+let showChoicesAgain = null;
 let wordWheel = null;
 
 function showView(name) {
@@ -1949,13 +2349,13 @@ async function handleWord(word) {
   if (key) {
     const entry = WORDS[key];
     if (entry.senses) showSenses(key);
-    else buildWordWheel(entry.words.map(([w, d, e]) => ({ w, d, e, src: 'builtin' })), key, null);
+    else buildWordWheel(entry.words.map(builtinItem), key);
     return;
   }
 
-  const cached = store.get('syn:' + word);
+  const cached = store.get(SYN + word);
   if (cached && cached.results && cached.results.length) {
-    buildOnlineWheel(word, cached.results);
+    showOnlineResults(word, cached.results);
     return;
   }
 
@@ -1963,24 +2363,46 @@ async function handleWord(word) {
   const res = await lookupOnline(word);
   if (token !== lookupToken) return; // the adult moved on while we waited
   if (res.status === 'found') {
-    store.set('syn:' + word, { results: res.results, pos: res.pos });
-    buildOnlineWheel(word, res.results);
+    store.set(SYN + word, { results: res.results, pos: res.pos });
+    showOnlineResults(word, res.results);
   } else {
     showFallback(word, res.status);
   }
 }
 
-function showSenses(key) {
-  currentSenseKey = key;
-  $('#sense-heading').textContent = `${capitalize(key)} like…`;
-  $('#sense-chips').replaceChildren(...WORDS[key].senses.map(sense =>
-    h('button', {
-      class: 'chip',
-      type: 'button',
-      onclick: () => buildWordWheel(sense.words.map(([w, d, e]) => ({ w, d, e, src: 'builtin' })), key, sense.label),
-    }, `${sense.icon} ${sense.label}`)
+const builtinItem = ([w, d, e]) => ({ w, d, e, src: 'builtin' });
+
+// Asks which meaning is wanted before building the wheel, like "Good like… kind / tasty".
+function showChoices(heading, choices) {
+  showChoicesAgain = () => showChoices(heading, choices);
+  $('#sense-heading').textContent = heading;
+  $('#sense-chips').replaceChildren(...choices.map(c =>
+    h('button', { class: 'chip', type: 'button', onclick: c.pick }, `${c.icon} ${c.label}`)
   ));
   showView('senses');
+}
+
+function showSenses(key) {
+  showChoices(`${capitalize(key)} like…`, WORDS[key].senses.map(sense => ({
+    icon: sense.icon,
+    label: sense.label,
+    pick: () => buildWordWheel(sense.words.map(builtinItem), key, sense.label, true),
+  })));
+}
+
+function showOnlineResults(word, results) {
+  const ending = wordEnding(word);
+  const same = ending ? results.filter(r => wordEnding(r.w) === ending) : [];
+  const other = results.filter(r => !same.includes(r));
+  // An "-ing" word can be an action or a thing ("was painting" / "the painting"), so let the adult pick.
+  if (ending === 'ing' && same.length >= 3 && other.length >= 3) {
+    showChoices(`${capitalize(word)} like…`, [
+      { icon: '🏃', label: `was ${word}`, pick: () => buildOnlineWheel(same, `was ${word}`, true) },
+      { icon: '📦', label: `the ${word}`, pick: () => buildOnlineWheel(other, `the ${word}`, true) },
+    ]);
+    return;
+  }
+  buildOnlineWheel(same.length >= 3 ? same : results, word, false);
 }
 
 function showFallback(word, status) {
@@ -1996,28 +2418,27 @@ function showFallback(word, status) {
   showView('fallback');
 }
 
-function buildOnlineWheel(word, results) {
-  const items = shuffled(results).slice(0, 8).map(r => ({ w: r.w, pos: r.pos, alt: r.alt, src: 'online' }));
-  buildWordWheel(items, word, null, true);
+function buildOnlineWheel(results, title, fromChoice) {
+  buildWordWheel(results.map(r => ({ w: r.w, pos: r.pos, alt: r.alt, src: 'online' })), title, null, fromChoice);
   // Fetch definitions while the wheel spins so the card is usually ready when it lands.
   // Two at a time: the dictionary errors more when it gets many requests at once.
-  mapLimit(items, 2, item => getDefinition(item.w, item.pos));
+  mapLimit(wheelItems, 2, item => getDefinition(item.w, item.pos));
 }
 
-function buildWordWheel(items, title, senseLabel, alreadyPicked = false) {
-  wheelItems = alreadyPicked ? items : shuffled(items).slice(0, 8);
+function buildWordWheel(items, title, note, fromChoice = false) {
+  wheelItems = shuffled(items).slice(0, WHEEL_MAX);
   const heading = $('#word-wheel-title');
   heading.replaceChildren();
-  if (title) heading.append('Better words for ', h('strong', {}, `“${title}”`), senseLabel ? ` (${senseLabel})` : '');
+  if (title) heading.append('Better words for ', h('strong', {}, `“${title}”`), note ? ` (${note})` : '');
   else heading.append(h('strong', {}, 'Your own wheel'));
-  $('#other-sense').hidden = !senseLabel;
+  $('#other-sense').hidden = !fromChoice;
   showView('wheel');
   if (!wordWheel) wordWheel = new Wheel($('#word-wheel-col'), spinWord);
   wordWheel.setItems(wheelItems.map(i => i.w));
 }
 
 $('#other-sense').addEventListener('click', () => {
-  if (currentSenseKey) showSenses(currentSenseKey);
+  if (showChoicesAgain) showChoicesAgain();
 });
 
 /* ---------- Make my own wheel ---------- */
@@ -2033,9 +2454,9 @@ $('#own-form').addEventListener('submit', e => {
   const words = [...new Set($('#own-input').value.split(/[,\s]+/).map(normalize).filter(Boolean))];
   const hint = $('#own-hint');
   if (words.length < 3) { hint.textContent = `Add ${3 - words.length} more word${words.length === 2 ? '' : 's'}. You need at least 3.`; return; }
-  if (words.length > 8) { hint.textContent = `That’s ${words.length} words. Take out ${words.length - 8} so there are 8 or fewer.`; return; }
+  if (words.length > WHEEL_MAX) { hint.textContent = `That’s ${words.length} words. Take out ${words.length - WHEEL_MAX} so there are ${WHEEL_MAX} or fewer.`; return; }
   $('#own-input').blur();
-  buildWordWheel(words.map(w => ({ w, src: 'own' })), null, null, true);
+  buildWordWheel(words.map(w => ({ w, src: 'own' })), null);
 });
 
 /* ---------- Spin + result card ---------- */
@@ -2057,7 +2478,7 @@ async function spinWord() {
 async function definitionFor(item) {
   if (item.src === 'builtin') return { d: item.d, e: item.e };
   if (item.src === 'own') {
-    const known = KNOWN_DEFS.get(item.w) || store.get('def:' + item.w);
+    const known = KNOWN_DEFS.get(item.w) || store.get(DEF + item.w);
     return known && known.d ? known : { d: null, missing: 'Ask your helper!' };
   }
   // With a backup definition in hand, don't keep the kid waiting on a slow dictionary.
@@ -2105,9 +2526,10 @@ async function showWordCard(item) {
 
 function acceptWord(word) {
   Sound.cheer();
-  const token = navToken;
+  let celebration = null;
+  // Only close the celebration itself, never a card opened after it.
   const done = () => {
-    if (token !== navToken || cardEl.hidden) return;
+    if (celebration !== cardToken) return;
     closeCard();
     newWord();
   };
@@ -2117,6 +2539,7 @@ function acceptWord(word) {
     h('p', { class: 'card-prompt' }, 'Write ', h('b', {}, word), ' in your story.'),
     h('div', { class: 'card-actions' }, h('button', { class: 'btn primary', type: 'button', onclick: done }, 'Next word')),
   ));
+  celebration = cardToken;
   const party = confetti();
   if (party) cardBox.append(party);
   setTimeout(done, 3200);
@@ -2180,7 +2603,7 @@ homeMascot.addEventListener('pointerdown', () => {
 ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => homeMascot.addEventListener(ev, stopHold));
 homeMascot.addEventListener('contextmenu', e => e.preventDefault());
 
-const savedWords = () => store.keys().filter(k => k.startsWith('syn:'));
+const savedWords = () => store.keys().filter(k => k.startsWith(SYN));
 
 function refreshSettings() {
   const n = savedWords().length;
@@ -2200,7 +2623,7 @@ $('#prewarm-btn').addEventListener('click', async () => {
   for (const [i, word] of words.entries()) {
     status.textContent = `Saving ${i + 1} of ${words.length}: ${word}…`;
     if (findBuiltIn(word)) { builtIn++; continue; }
-    let entry = store.get('syn:' + word);
+    let entry = store.get(SYN + word);
     if (!entry) {
       const res = await lookupOnline(word);
       if (res.status === 'offline') {
@@ -2210,7 +2633,7 @@ $('#prewarm-btn').addEventListener('click', async () => {
       }
       if (res.status === 'none') { unknown++; continue; }
       entry = { results: res.results, pos: res.pos };
-      store.set('syn:' + word, entry);
+      store.set(SYN + word, entry);
     }
     await mapLimit(entry.results, 2, r => getDefinition(r.w, r.pos));
     saved++;
@@ -2249,6 +2672,8 @@ clearBtn.addEventListener('click', () => {
    Start up
    ===================================================================== */
 renderMute();
+// Drop lookups saved by earlier versions.
+for (const k of store.keys()) if (!k.startsWith(SYN) && !k.startsWith(DEF)) store.remove(k);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeech(); });
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
