@@ -206,6 +206,9 @@ h1, h2, h3, p { margin: 0; }
   padding-top: 4vh;
 }
 .panel-label { font-size: 30px; font-weight: 800; }
+.panel-sub { display: block; margin-top: 8px; font-size: 22px; font-weight: 600; color: var(--ink-soft); text-wrap: balance; }
+.panel-sub strong { color: var(--ink); font-weight: 900; }
+.keep { display: inline-block; } /* wraps between these chunks first */
 .big-input {
   width: 100%;
   min-height: 84px;
@@ -454,7 +457,8 @@ h1, h2, h3, p { margin: 0; }
 
   <div class="panel" data-view="input">
     <form id="word-form" class="stack" autocomplete="off">
-      <label class="panel-label" for="word-input">What word do you want to change?</label>
+      <label class="panel-label" for="word-input">What word do you want to change?
+        <span class="panel-sub"><span class="keep">Type an <strong>adjective</strong> (a describing word)</span> <span class="keep">or a <strong>verb</strong> (an action word).</span></span></label>
       <input id="word-input" class="big-input" type="text" maxlength="30" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" placeholder="like good or said">
       <p class="hint" id="word-hint"></p>
       <button class="btn primary xl" type="submit">Make My Wheel</button>
@@ -480,6 +484,16 @@ h1, h2, h3, p { margin: 0; }
     <div class="row">
       <button class="btn primary" type="button" id="make-own-btn">Make my own wheel</button>
       <button class="btn ghost" type="button" data-action="new-word">Try another word</button>
+    </div>
+  </div>
+
+  <div class="panel" data-view="noun" hidden>
+    <div class="mascot mascot-small"><img src="img/cat.png" alt="" width="640" height="538" draggable="false"></div>
+    <p class="msg" id="noun-msg"></p>
+    <p class="panel-sub">This wheel is made for <strong>adjectives</strong> like “scary” and <strong>verbs</strong> like “stomped.” Try a word that describes it or tells what it does!</p>
+    <div class="row">
+      <button class="btn primary" type="button" data-action="new-word">Try another word</button>
+      <button class="btn ghost" type="button" id="noun-anyway">Show me anyway</button>
     </div>
   </div>
 
@@ -1867,12 +1881,29 @@ function filterResults(list, word, ending) {
   return out;
 }
 
+// The words that usually come right before a word give it away: "the monster" is a thing, "to scream" is an action.
+const BEFORE_NOUN = new Set(['the', 'a', 'an', 'his', 'her', 'my', 'your', 'this', 'that', 'its', 'our', 'their',
+  'these', 'those', 'every', 'each', 'another', 'one', 'some', 'any', 'no']);
+const BEFORE_VERB = new Set(['to', 'not', 'would', 'will', 'can', 'could', 'must', 'should', 'might', 'may', 'cannot',
+  'i', 'you', 'we', 'they', 'he', 'she', 'it', 'who', 'which', 'then', 'did', 'never', 'always', 'just']);
+
+// Datamuse lists "noun" first for plenty of action words ("scream", "jumps"), so only call it a noun
+// when it almost never follows the words that come before verbs.
+function looksLikeNoun(before) {
+  let noun = 0, verb = 0;
+  for (const r of before || []) {
+    if (BEFORE_NOUN.has(r.word)) noun += r.score;
+    else if (BEFORE_VERB.has(r.word)) verb += r.score;
+  }
+  return noun + verb > 0 && verb / (noun + verb) < 0.08;
+}
+
 function mergeResults(a, b) {
   const seen = new Set(a.map(r => r.w));
   return a.concat(b.filter(r => !seen.has(r.w)));
 }
 
-// Synonyms from Datamuse. Resolves to { status: 'found' | 'none' | 'offline', results, pos }.
+// Synonyms from Datamuse. Resolves to { status: 'found' | 'none' | 'offline', results, pos, noun }.
 async function lookupOnline(word) {
   const dl = deadline();
   const q = encodeURIComponent(word);
@@ -1883,6 +1914,7 @@ async function lookupOnline(word) {
   const selfP = request(`https://api.datamuse.com/words?sp=${q}&md=p&max=1`, dl.signal);
   const mlP = dm(`ml=${q}`);
   const trgP = dm(`rel_trg=${q}`);
+  const beforeP = request(`https://api.datamuse.com/words?rel_bgb=${q}&max=30`, dl.signal);
   try {
     const syn = await synP;
     if (!syn.ok) return { status: 'offline' };
@@ -1891,6 +1923,13 @@ async function lookupOnline(word) {
     const pos = me ? (me.tags || []).find(t => POS_TAGS.includes(t)) || null : null;
 
     const ending = wordEnding(word);
+    // "-ing" and "-ed" words are often tagged as nouns but are almost always actions here.
+    // Datamuse tags plural nouns "N".
+    let noun = false;
+    if (me && !ending && ['n', 'N'].includes((me.tags || [])[0])) {
+      const before = await beforeP;
+      noun = before.ok && looksLikeNoun(before.data);
+    }
     const matching = list => ending ? list.filter(r => wordEnding(r.w) === ending) : list;
     let results = filterResults(syn.data, word, ending);
     if (matching(results).length < 4) {
@@ -1918,7 +1957,7 @@ async function lookupOnline(word) {
         : r.tags.includes(pos) ? pos : r.tags[0] || pos;
       return { w: r.w, pos: rPos, alt: backupDefinition(r.defs, rPos) };
     });
-    return { status: results.length ? 'found' : 'none', results, pos };
+    return { status: results.length ? 'found' : 'none', results, pos, noun };
   } finally {
     dl.finish();
   }
@@ -2355,7 +2394,8 @@ async function handleWord(word) {
 
   const cached = store.get(SYN + word);
   if (cached && cached.results && cached.results.length) {
-    showOnlineResults(word, cached.results);
+    if (cached.noun) showNounWarning(word, cached.results);
+    else showOnlineResults(word, cached.results);
     return;
   }
 
@@ -2363,8 +2403,11 @@ async function handleWord(word) {
   const res = await lookupOnline(word);
   if (token !== lookupToken) return; // the adult moved on while we waited
   if (res.status === 'found') {
-    store.set(SYN + word, { results: res.results, pos: res.pos });
-    showOnlineResults(word, res.results);
+    store.set(SYN + word, { results: res.results, pos: res.pos, noun: res.noun });
+    if (res.noun) showNounWarning(word, res.results);
+    else showOnlineResults(word, res.results);
+  } else if (res.noun) {
+    showNounWarning(word, null);
   } else {
     showFallback(word, res.status);
   }
@@ -2403,6 +2446,15 @@ function showOnlineResults(word, results) {
     return;
   }
   buildOnlineWheel(same.length >= 3 ? same : results, word, false);
+}
+
+// Nouns get a gentle nudge toward describing and action words, but can still have their wheel.
+function showNounWarning(word, results) {
+  $('#noun-msg').textContent = `“${capitalize(word)}” is a noun (a person, place, or thing).`;
+  const anyway = $('#noun-anyway');
+  anyway.hidden = !results;
+  anyway.onclick = results ? () => showOnlineResults(word, results) : null;
+  showView('noun');
 }
 
 function showFallback(word, status) {
@@ -2632,7 +2684,7 @@ $('#prewarm-btn').addEventListener('click', async () => {
         continue;
       }
       if (res.status === 'none') { unknown++; continue; }
-      entry = { results: res.results, pos: res.pos };
+      entry = { results: res.results, pos: res.pos, noun: res.noun };
       store.set(SYN + word, entry);
     }
     await mapLimit(entry.results, 2, r => getDefinition(r.w, r.pos));

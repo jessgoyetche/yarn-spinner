@@ -22,7 +22,7 @@ The full spec is in [docs/writing-spinner-spec.md](docs/writing-spinner-spec.md)
 ## How words are found
 
 1. The built-in word book (50 common "tired" words, inside `index.html`) is always checked first, so most lookups never need the internet. Each word has up to 16 replacements, mixing everyday words with harder ones to stretch vocabulary.
-2. Unknown words go to the [Datamuse API](https://www.datamuse.com/api/) for synonyms, filtered for common, kid-appropriate words. Words ending in "-ing" or "-ed" get answers in the same form (giggled → snickered), and an "-ing" word asks whether it's an action or a thing ("was painting" or "the painting").
+2. Unknown words go to the [Datamuse API](https://www.datamuse.com/api/) for synonyms, filtered for common, kid-appropriate words. Words ending in "-ing" or "-ed" get answers in the same form (giggled → snickered), and an "-ing" word asks whether it's an action or a thing ("was painting" or "the painting"). A word that's almost always a noun ("monster", "doors") gets a gentle note that the wheel is made for adjectives and verbs, with a "Show me anyway" button. Datamuse decides this from the words that usually come right before it ("the monster" vs. "to scream"), so it only works online.
 3. Definitions for those come from [dictionaryapi.dev](https://dictionaryapi.dev/), with Datamuse's own definitions as a backup because the dictionary is sometimes down.
 4. Every lookup that works is saved on the device, so it keeps working offline.
 
