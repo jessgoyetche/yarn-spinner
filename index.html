@@ -1,0 +1,2290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Yarn Spinner">
+<meta name="theme-color" content="#FFF7EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17122E" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Spin the wheel to find a better word or get unstuck while writing a story.">
+<title>Yarn Spinner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<style>
+:root {
+  --bg: #FFF7EA;
+  --surface: #FFFFFF;
+  --ink: #241B4B;
+  --ink-soft: #5B5380;
+  --line: #E6DDF7;
+  --primary: #6F4BF2;
+  --primary-shade: #4B2DBF;
+  --on-primary: #FFFFFF;
+  --word: #FF8A65;
+  --word-shade: #D9613D;
+  --stuck: #2EC4B6;
+  --stuck-shade: #1C978B;
+  --yes: #1F8A3E;
+  --yes-shade: #146329;
+  --chip: #F1EBFF;
+  --chip-ink: #3A2A80;
+  --ghost-shade: #D7CCF2;
+  --rim: #241B4B;
+  --seg-line: #FFFFFF;
+  --seg-ink: #1E1940;
+  --pointer: #FF4D6D;
+  --dot-off: #B8B2C9;
+  --dot-on: #22C55E;
+  --backdrop: rgba(36, 27, 75, 0.55);
+  --shadow: 0 10px 30px rgba(36, 27, 75, 0.15);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17122E;
+    --surface: #251E45;
+    --ink: #F5F1FF;
+    --ink-soft: #B9B0DD;
+    --line: #3A3166;
+    --primary: #8F73FF;
+    --primary-shade: #5E43D1;
+    --on-primary: #FFFFFF;
+    --word-shade: #B8502F;
+    --stuck-shade: #157A70;
+    --yes: #2A9D4B;
+    --yes-shade: #176B30;
+    --chip: #342B60;
+    --chip-ink: #EDE6FF;
+    --ghost-shade: #120D26;
+    --rim: #0D0920;
+    --seg-line: #251E45;
+    --dot-off: #5D5680;
+    --backdrop: rgba(5, 3, 15, 0.7);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    color-scheme: dark;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation; overscroll-behavior: none; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", Nunito, system-ui, -apple-system, sans-serif;
+  font-size: 22px;
+  line-height: 1.4;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+[hidden] { display: none !important; }
+button, input, textarea { font: inherit; color: inherit; }
+button { touch-action: manipulation; cursor: pointer; -webkit-user-select: none; user-select: none; }
+h1, h2, h3, p { margin: 0; }
+
+.screen {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 20px) calc(env(safe-area-inset-bottom) + 24px) calc(env(safe-area-inset-left) + 20px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  min-height: 60px;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 999px;
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 5px 0 var(--ghost-shade);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 var(--ghost-shade); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn.primary { background: var(--primary); color: var(--on-primary); box-shadow: 0 5px 0 var(--primary-shade); }
+.btn.primary:active:not(:disabled) { box-shadow: 0 2px 0 var(--primary-shade); }
+.btn.yes { background: var(--yes); color: #fff; box-shadow: 0 5px 0 var(--yes-shade); }
+.btn.yes:active { box-shadow: 0 2px 0 var(--yes-shade); }
+.btn.ghost { background: transparent; box-shadow: none; border: 3px solid var(--line); }
+.btn.ghost:active { transform: translateY(2px); box-shadow: none; }
+.btn.xl { min-height: 76px; font-size: 32px; padding: 10px 56px; }
+.btn.danger { background: #E03E52; color: #fff; box-shadow: 0 5px 0 #A82536; }
+.btn:focus-visible, .chip:focus-visible, .home-btn:focus-visible, .icon-btn:focus-visible { outline: 4px solid var(--pointer); outline-offset: 3px; }
+
+.icon-btn {
+  min-width: 56px;
+  min-height: 56px;
+  border: none;
+  border-radius: 18px;
+  background: var(--chip);
+  font-size: 26px;
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  margin-bottom: 12px;
+}
+.topbar h2 { font-size: 26px; font-weight: 800; text-align: center; }
+.topbar .back {
+  justify-self: start;
+  min-height: 56px;
+  padding: 8px 22px 8px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--chip-ink);
+  font-size: 22px;
+  font-weight: 800;
+}
+.topbar .mute-btn { justify-self: end; }
+
+/* ---------- Home ---------- */
+.home { justify-content: center; align-items: center; gap: 36px; text-align: center; }
+.home-hero { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.mascot svg { display: block; width: 100%; height: auto; }
+.mascot-home {
+  width: min(220px, 42vw);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+  animation: bob 3.2s ease-in-out infinite;
+}
+.mascot-home.wiggle { animation: wiggle 0.5s ease-in-out; }
+.app-title { font-size: clamp(48px, 9vw, 80px); font-weight: 900; letter-spacing: -1px; line-height: 1.05; }
+.tagline { font-size: 24px; color: var(--ink-soft); }
+.home-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; width: 100%; max-width: 900px; }
+.home-btn {
+  flex: 1 1 320px;
+  max-width: 420px;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 32px;
+  font-size: 32px;
+  font-weight: 900;
+  color: #241B4B;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.home-btn:active { transform: translateY(5px); }
+.home-word { background: var(--word); box-shadow: 0 8px 0 var(--word-shade); }
+.home-word:active { box-shadow: 0 3px 0 var(--word-shade); }
+.home-stuck { background: var(--stuck); box-shadow: 0 8px 0 var(--stuck-shade); }
+.home-stuck:active { box-shadow: 0 3px 0 var(--stuck-shade); }
+.home-emoji { font-size: 52px; line-height: 1; }
+
+/* ---------- Panels (Word mode views) ---------- */
+.panel {
+  flex: 1;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  text-align: center;
+  padding-top: 4vh;
+}
+.panel-label { font-size: 30px; font-weight: 800; }
+.big-input {
+  width: 100%;
+  min-height: 84px;
+  padding: 10px 24px;
+  border: 4px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  font-size: 40px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+}
+.big-input:focus { border-color: var(--primary); }
+.big-input.shake { animation: shake 0.35s; }
+.big-input.list-input { font-size: 30px; }
+.hint { font-size: 20px; color: var(--ink-soft); min-height: 1.4em; }
+.mascot-small { width: 120px; }
+.msg { font-size: 30px; font-weight: 800; }
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.chip {
+  min-height: 60px;
+  padding: 8px 28px;
+  border: none;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--chip-ink);
+  font-size: 26px;
+  font-weight: 800;
+  box-shadow: 0 4px 0 var(--ghost-shade);
+}
+.chip:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--ghost-shade); }
+.sense-heading { font-size: 40px; font-weight: 900; }
+.sense-chips .chip { min-height: 80px; font-size: 32px; padding: 8px 36px; }
+.row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.stack { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.try-label { font-size: 24px; font-weight: 800; align-self: center; }
+
+.loading-dots { display: flex; gap: 12px; }
+.loading-dots span {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--primary);
+  animation: dot 1s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+/* ---------- Wheel ---------- */
+.wheel-panel {
+  flex: 1;
+  --wheel: min(88vw, calc(100vh - 380px), 620px);
+  --wheel: min(88vw, calc(100svh - 380px), 620px);
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+  align-content: start;
+  grid-template-columns: var(--wheel);
+  grid-template-areas: "title" "wheel" "spin" "extra";
+  gap: 18px;
+}
+@media (orientation: landscape) and (min-width: 700px) {
+  .wheel-panel {
+    --wheel: min(calc(100vh - 230px), 54vw, 620px);
+    --wheel: min(calc(100svh - 230px), 54vw, 620px);
+    grid-template-columns: var(--wheel) minmax(260px, 380px);
+    grid-template-rows: 1fr auto auto auto 1fr;
+    grid-template-areas: "wheel ." "wheel title" "wheel spin" "wheel extra" "wheel .";
+    align-content: center;
+    column-gap: 48px;
+  }
+}
+.wheel-title { grid-area: title; font-size: 26px; font-weight: 700; color: var(--ink-soft); text-align: center; }
+.wheel-title strong { color: var(--ink); font-weight: 900; }
+.wheel-col { grid-area: wheel; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.wheel-wrap {
+  position: relative;
+  width: var(--wheel);
+  min-width: 260px;
+  aspect-ratio: 1;
+  overflow: hidden; /* the spinning square's corners would otherwise widen the page */
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.wheel-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wheel-rotor { transform-origin: 50% 50%; transition: opacity 0.18s; will-change: transform; }
+.wheel-rotor.faded { opacity: 0; }
+.wheel-rotor .seg { stroke: var(--seg-line); stroke-width: 3; }
+.wheel-rotor .seg-label { fill: var(--seg-ink); font-weight: 800; }
+.wheel-rotor .rim { fill: none; stroke: var(--rim); stroke-width: 10; }
+.wheel-rotor .peg { fill: #fff; stroke: var(--rim); stroke-width: 2; }
+.wheel-overlay .pointer { fill: var(--pointer); stroke: var(--rim); stroke-width: 5; stroke-linejoin: round; }
+.wheel-overlay .hub { fill: var(--surface); stroke: var(--rim); stroke-width: 6; }
+.wheel-overlay .hub-dot { fill: var(--pointer); }
+.readout {
+  min-width: min(100%, 320px);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 3px solid var(--line);
+  font-size: 32px;
+  font-weight: 900;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.readout.idle { color: var(--ink-soft); font-weight: 700; font-size: 26px; }
+.readout.landed { border-color: var(--pointer); }
+.spin-btn { grid-area: spin; }
+.wheel-extra { grid-area: extra; }
+
+/* ---------- Result card ---------- */
+.card-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(env(safe-area-inset-top) + 16px) calc(env(safe-area-inset-right) + 16px) calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 16px);
+  background: var(--backdrop);
+  animation: fade-in 0.2s ease-out;
+}
+.card {
+  position: relative;
+  overflow: hidden;
+  width: min(680px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 32px 32px 36px;
+  border-radius: 32px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: center;
+  animation: pop-in 0.28s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.card-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.card-kicker { font-size: 22px; font-weight: 700; color: var(--ink-soft); }
+.card-word { font-size: clamp(44px, 10vw, 64px); font-weight: 900; line-height: 1.1; color: var(--primary); overflow-wrap: anywhere; outline: none; }
+.card-def { font-size: 28px; font-weight: 700; }
+.card-def.pending { color: var(--ink-soft); font-weight: 600; }
+.card-prompt { font-size: 34px; font-weight: 800; }
+.card-example { font-size: 26px; font-style: italic; color: var(--ink-soft); }
+.card-example b { color: var(--ink); }
+.example-label { font-style: normal; font-weight: 800; }
+.card-question { font-size: 24px; font-weight: 800; margin-top: 6px; }
+.card-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 4px; }
+.hear-btn { min-height: 52px; font-size: 22px; padding: 6px 22px; }
+.celebrate-emoji { font-size: 84px; line-height: 1; animation: pop-in 0.4s cubic-bezier(0.2, 1.6, 0.4, 1); }
+
+.confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.confetti span {
+  position: absolute;
+  top: -20px;
+  left: var(--x);
+  width: 12px;
+  height: 18px;
+  border-radius: 3px;
+  background: var(--c);
+  animation: fall var(--t) ease-in var(--delay) forwards;
+}
+
+/* ---------- Settings ---------- */
+.settings { max-width: 760px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.settings section { background: var(--surface); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow); }
+.settings h3 { font-size: 26px; font-weight: 900; }
+.settings p { font-size: 20px; color: var(--ink-soft); }
+.settings textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 18px;
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  background: var(--bg);
+  font-size: 22px;
+  resize: vertical;
+}
+.settings .btn { align-self: flex-start; }
+.word-list { font-size: 20px; line-height: 1.7; }
+
+/* ---------- Network dot (for the adult) ---------- */
+.net-dot {
+  position: fixed;
+  right: calc(env(safe-area-inset-right) + 10px);
+  bottom: calc(env(safe-area-inset-bottom) + 10px);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dot-off);
+  pointer-events: none;
+  z-index: 20;
+}
+.net-dot.on { background: var(--dot-on); }
+
+/* ---------- Animations ---------- */
+.mascot-eye { transform-box: fill-box; transform-origin: center; animation: blink 4.5s infinite; }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+@keyframes dot { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-12px); opacity: 1; } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes pop-in { from { opacity: 0; transform: scale(0.85); } }
+@keyframes fall { to { transform: translate3d(var(--dx), 720px, 0) rotate(var(--r)); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  /* The short fade is the reduced-motion stand-in for the spin, so keep it. */
+  .wheel-rotor { transition-duration: 0.18s !important; }
+}
+</style>
+</head>
+<body>
+
+<template id="mascot-tpl">
+  <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+    <path d="M62 60 Q56 30 74 16 Q78 40 88 52 Z" fill="#FFC93C"/>
+    <path d="M138 60 Q144 30 126 16 Q122 40 112 52 Z" fill="#FFC93C"/>
+    <path d="M34 120 Q10 106 18 82" stroke="#7C5CFF" stroke-width="15" stroke-linecap="round" fill="none"/>
+    <path d="M166 122 Q188 134 182 156" stroke="#7C5CFF" stroke-width="15" stroke-linecap="round" fill="none"/>
+    <ellipse cx="72" cy="184" rx="23" ry="11" fill="#5A3BD6"/>
+    <ellipse cx="128" cy="184" rx="23" ry="11" fill="#5A3BD6"/>
+    <path d="M100 40 C152 40 176 80 176 122 C176 162 146 184 100 184 C54 184 24 162 24 122 C24 80 48 40 100 40 Z" fill="#7C5CFF"/>
+    <ellipse cx="100" cy="150" rx="44" ry="28" fill="#A48BFF"/>
+    <circle cx="50" cy="96" r="7" fill="#A48BFF"/>
+    <circle cx="152" cy="90" r="5" fill="#A48BFF"/>
+    <circle cx="160" cy="108" r="3.5" fill="#A48BFF"/>
+    <circle cx="62" cy="126" r="8" fill="#FF8FB1" opacity="0.7"/>
+    <circle cx="138" cy="126" r="8" fill="#FF8FB1" opacity="0.7"/>
+    <g class="mascot-eye">
+      <circle cx="100" cy="90" r="30" fill="#FFFFFF"/>
+      <circle cx="106" cy="94" r="14" fill="#241B4B"/>
+      <circle cx="111" cy="88" r="4.5" fill="#FFFFFF"/>
+    </g>
+    <path d="M70 128 Q100 160 130 128 Q100 138 70 128 Z" fill="#241B4B"/>
+    <path d="M83 131 L89 141 L95 132.6 Z" fill="#FFFFFF"/>
+    <path d="M105 132.6 L111 141 L117 131 Z" fill="#FFFFFF"/>
+  </svg>
+</template>
+
+<template id="wheel-tpl">
+  <div class="wheel-wrap" role="button" tabindex="0">
+    <svg class="wheel-rotor" viewBox="0 0 400 400" aria-hidden="true" focusable="false"></svg>
+    <svg class="wheel-overlay" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+      <circle class="hub" cx="200" cy="200" r="30"/>
+      <circle class="hub-dot" cx="200" cy="200" r="10"/>
+      <path class="pointer" d="M176 4 H224 L200 48 Z"/>
+    </svg>
+  </div>
+</template>
+
+<!-- Home -->
+<section id="home" class="screen home">
+  <div class="home-hero">
+    <div class="mascot mascot-home" data-mascot role="img" aria-label="Spinny the monster"></div>
+    <h1 class="app-title">Yarn Spinner</h1>
+    <p class="tagline">Spin the wheel. Write a monster story!</p>
+  </div>
+  <div class="home-buttons">
+    <button class="home-btn home-word" type="button" data-go="word"><span class="home-emoji" aria-hidden="true">🔍</span>Find a Better Word</button>
+    <button class="home-btn home-stuck" type="button" data-go="stuck"><span class="home-emoji" aria-hidden="true">🤔</span>I'm Stuck</button>
+  </div>
+</section>
+
+<!-- Mode 1: Word Wheel -->
+<section id="word" class="screen" hidden>
+  <header class="topbar">
+    <button class="back" type="button" data-go="home">← Home</button>
+    <h2>Find a Better Word</h2>
+    <button class="icon-btn mute-btn" type="button"></button>
+  </header>
+
+  <div class="panel" data-view="input">
+    <form id="word-form" class="stack" autocomplete="off">
+      <label class="panel-label" for="word-input">What word do you want to change?</label>
+      <input id="word-input" class="big-input" type="text" maxlength="30" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" placeholder="like good or said">
+      <p class="hint" id="word-hint"></p>
+      <button class="btn primary xl" type="submit">Make My Wheel</button>
+    </form>
+  </div>
+
+  <div class="panel" data-view="loading" hidden>
+    <div class="mascot mascot-small" data-mascot></div>
+    <p class="msg">Looking it up…</p>
+    <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="panel" data-view="senses" hidden>
+    <h3 class="sense-heading" id="sense-heading"></h3>
+    <div class="chips sense-chips" id="sense-chips"></div>
+    <button class="btn ghost" type="button" data-action="new-word">Try a different word</button>
+  </div>
+
+  <div class="panel" data-view="fallback" hidden>
+    <div class="mascot mascot-small" data-mascot></div>
+    <p class="msg" id="fallback-msg"></p>
+    <div id="fallback-try" class="chips"></div>
+    <div class="row">
+      <button class="btn primary" type="button" id="make-own-btn">Make my own wheel</button>
+      <button class="btn ghost" type="button" data-action="new-word">Try another word</button>
+    </div>
+  </div>
+
+  <div class="panel" data-view="own" hidden>
+    <form id="own-form" class="stack" autocomplete="off">
+      <label class="panel-label" for="own-input">Type 3 to 8 words for the wheel</label>
+      <input id="own-input" class="big-input list-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" placeholder="stomped, crept, zoomed">
+      <p class="hint" id="own-hint">Put a comma or space between the words.</p>
+      <div class="row">
+        <button class="btn primary xl" type="submit">Build My Wheel</button>
+      </div>
+      <button class="btn ghost" type="button" data-action="new-word">Try another word</button>
+    </form>
+  </div>
+
+  <div class="wheel-panel" data-view="wheel" hidden>
+    <p class="wheel-title" id="word-wheel-title"></p>
+    <div class="wheel-col" id="word-wheel-col"></div>
+    <button class="btn primary xl spin-btn" type="button" id="word-spin">Spin!</button>
+    <div class="row wheel-extra">
+      <button class="btn ghost" type="button" data-action="new-word">New word</button>
+      <button class="btn ghost" type="button" id="other-sense" hidden>Other meaning</button>
+    </div>
+  </div>
+</section>
+
+<!-- Mode 2: Stuck Wheel -->
+<section id="stuck" class="screen" hidden>
+  <header class="topbar">
+    <button class="back" type="button" data-go="home">← Home</button>
+    <h2>I'm Stuck</h2>
+    <button class="icon-btn mute-btn" type="button"></button>
+  </header>
+  <div class="wheel-panel">
+    <p class="wheel-title">What should you write <strong>next</strong>?</p>
+    <div class="wheel-col" id="stuck-wheel-col"></div>
+    <button class="btn primary xl spin-btn" type="button" id="stuck-spin">Spin!</button>
+  </div>
+</section>
+
+<!-- Hidden helper settings (long-press the monster on Home) -->
+<section id="settings" class="screen" hidden>
+  <header class="topbar">
+    <button class="back" type="button" data-go="home">← Home</button>
+    <h2>Helper Settings</h2>
+    <span></span>
+  </header>
+  <div class="settings">
+    <section>
+      <h3>Get words ready for offline</h3>
+      <p>While you're on good Wi-Fi, paste the words you expect students to use (commas or new lines between them), then tap Download. Words from the built-in word book don't need it.</p>
+      <textarea id="prewarm-input" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="shiny, brave, crunchy"></textarea>
+      <button class="btn primary" type="button" id="prewarm-btn">Download for offline</button>
+      <p id="prewarm-status" aria-live="polite"></p>
+    </section>
+    <section>
+      <h3>Saved words</h3>
+      <p id="saved-count"></p>
+      <button class="btn ghost" type="button" id="clear-btn">Clear saved words</button>
+    </section>
+    <section>
+      <h3>Built-in word book</h3>
+      <p class="word-list" id="builtin-list"></p>
+    </section>
+  </div>
+</section>
+
+<div id="card" class="card-backdrop" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="card-title" id="card-box"></div>
+</div>
+
+<div class="net-dot" id="net-dot" aria-hidden="true"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   Built-in word book
+   Each replacement is [word, kid-friendly definition, example sentence].
+   `forms` lists other spellings that should find the same entry.
+   Words with more than one meaning use `senses` instead of `words`.
+   ===================================================================== */
+const WORDS = {
+  good: { senses: [
+    { label: 'kind', icon: '💛', words: [
+      ['caring', 'showing that you care about others', 'The caring monster tucked a blanket around the baby bird.'],
+      ['gentle', 'soft and careful, never rough', 'The giant monster gave Mia a gentle pat.'],
+      ['friendly', 'warm and happy to be your pal', 'A friendly monster waved from the window.'],
+      ['helpful', 'ready and happy to help', 'The helpful monster carried our backpacks up the hill.'],
+      ['generous', 'happy to share and give to others', 'The generous monster shared its whole bag of cookies.'],
+      ['thoughtful', 'thinking about what others need or feel', 'The thoughtful monster saved Leo a seat.'],
+      ['sweet', 'kind and easy to love', 'The sweet monster sang the baby to sleep.'],
+    ]},
+    { label: 'tasty', icon: '🍰', words: [
+      ['delicious', 'tasting really, really good', 'The monster slurped a delicious bowl of worm soup.'],
+      ['yummy', 'tasting very good', '“These mud pies are yummy!” said the monster.'],
+      ['scrumptious', 'so tasty you want more and more', 'Grandma Monster baked a scrumptious slime cake.'],
+      ['mouthwatering', 'smelling or looking so good it makes you hungry', 'A mouthwatering smell drifted out of the cave.'],
+      ['flavorful', 'full of strong, good taste', 'The monster stirred the flavorful swamp stew.'],
+      ['tasty', 'good to eat', 'The monster munched on a tasty pickle.'],
+      ['juicy', 'full of sweet juice', 'The monster bit into a juicy pear.'],
+    ]},
+    { label: 'skilled', icon: '🏆', words: [
+      ['talented', 'naturally really good at something', 'The talented monster juggled six pumpkins.'],
+      ['skilled', 'good at something because you practiced', 'Mia was a skilled tree climber.'],
+      ['expert', 'really, really good at something', 'The monster was an expert at hide-and-seek.'],
+      ['brilliant', 'amazingly smart or good at something', 'Leo had a brilliant plan to trap the monster.'],
+      ['clever', 'quick at thinking and figuring things out', 'The clever monster hid behind the curtain.'],
+      ['excellent', 'very, very good', 'The monster was an excellent dancer.'],
+    ]},
+    { label: 'great', icon: '🎉', words: [
+      ['wonderful', 'very good and makes you happy', 'We had a wonderful time at the monster party.'],
+      ['fantastic', 'amazingly good', 'The fireworks over the castle were fantastic.'],
+      ['terrific', 'really great', 'The monster did a terrific cartwheel.'],
+      ['awesome', 'so cool it makes you say “wow”', 'Riding on the dragon’s back was awesome.'],
+      ['amazing', 'so good it surprises you', 'The monster built an amazing sandcastle.'],
+      ['perfect', 'just right, with nothing wrong', 'It was a perfect day for a monster picnic.'],
+    ]},
+  ]},
+
+  bad: { senses: [
+    { label: 'mean', icon: '😈', words: [
+      ['wicked', 'very bad and mean on purpose', 'The wicked witch locked the monster in a tower.'],
+      ['cruel', 'mean in a way that hurts others', 'The cruel king laughed at the little monster.'],
+      ['nasty', 'very mean or unkind', 'The troll left a nasty note on the door.'],
+      ['naughty', 'not behaving; breaking the rules', 'The naughty monster drew on the walls.'],
+      ['evil', 'as bad and mean as can be', 'An evil shadow crept across the village.'],
+      ['mischievous', 'playfully causing small trouble', 'The mischievous monster hid everyone’s shoes.'],
+    ]},
+    { label: 'awful', icon: '⛈️', words: [
+      ['awful', 'really, really bad', 'The monster had an awful cold.'],
+      ['terrible', 'extremely bad', 'A terrible storm shook the cabin.'],
+      ['horrible', 'so bad it makes you shudder', 'The monster made a horrible screech.'],
+      ['dreadful', 'so bad it fills you with worry', 'We heard dreadful news from the forest.'],
+      ['disastrous', 'so bad it ruins everything', 'The monster’s first try at cooking was disastrous.'],
+      ['lousy', 'pretty bad; not good at all', 'It was a lousy day to lose your flashlight.'],
+    ]},
+    { label: 'yucky', icon: '🤢', words: [
+      ['disgusting', 'so gross it makes you feel sick', 'The monster’s sock smelled disgusting.'],
+      ['gross', 'yucky and unpleasant', 'The swamp water looked gross.'],
+      ['rotten', 'old and going bad', 'The monster snacked on a rotten apple.'],
+      ['spoiled', 'food that has gone bad', 'Spoiled milk sat in the monster’s fridge.'],
+      ['foul', 'smelling or tasting really bad', 'A foul smell came from under the bed.'],
+      ['moldy', 'covered in fuzzy spots from going bad', 'The monster munched a moldy sandwich.'],
+    ]},
+  ]},
+
+  big: { forms: 'large', words: [
+    ['huge', 'very, very big', 'A huge monster blocked the door.'],
+    ['enormous', 'much bigger than normal', 'The monster had enormous feet.'],
+    ['gigantic', 'as big as a giant', 'A gigantic footprint was stamped in the mud.'],
+    ['massive', 'big, heavy, and solid', 'The monster lifted a massive boulder.'],
+    ['towering', 'very tall, rising high above', 'The towering monster peeked over the roof.'],
+    ['colossal', 'unbelievably big', 'A colossal shadow fell over the town.'],
+    ['hulking', 'big, heavy, and clumsy-looking', 'The hulking monster squeezed through the doorway.'],
+    ['mammoth', 'as big as a woolly mammoth', 'The monster carried a mammoth bag of candy.'],
+    ['monstrous', 'big and scary, like a monster', 'A monstrous wave crashed on the shore.'],
+  ]},
+
+  small: { forms: 'little', words: [
+    ['tiny', 'very, very small', 'A tiny monster lived in Mia’s sock drawer.'],
+    ['teeny', 'super tiny', 'The monster had teeny wings that buzzed.'],
+    ['miniature', 'a much smaller size than usual', 'The monster rode a miniature horse.'],
+    ['puny', 'small and weak', 'The dragon laughed at the puny knight.'],
+    ['microscopic', 'so small you need a microscope to see it', 'Microscopic bugs crawled in the monster’s fur.'],
+    ['wee', 'very small', 'A wee monster hid under the mushroom.'],
+    ['pint-sized', 'small enough to fit in a cup', 'The pint-sized monster climbed onto the table.'],
+    ['itty-bitty', 'super-duper small', 'It had itty-bitty teeth like grains of rice.'],
+    ['compact', 'small and packed tightly', 'The monster folded into a compact ball.'],
+  ]},
+
+  nice: { senses: [
+    { label: 'kind', icon: '🤗', words: [
+      ['kind', 'gentle and caring toward others', 'The kind monster helped the lost puppy home.'],
+      ['friendly', 'warm and happy to be your pal', 'A friendly monster waved from the window.'],
+      ['polite', 'using good manners', 'The polite monster said please and thank you.'],
+      ['gentle', 'soft and careful, never rough', 'The gentle monster held the kitten like an egg.'],
+      ['cheerful', 'happy and smiling', 'A cheerful monster whistled while it worked.'],
+      ['caring', 'showing that you care about others', 'The caring monster made Leo some soup.'],
+    ]},
+    { label: 'pleasant', icon: '☀️', words: [
+      ['pleasant', 'making you feel calm and happy', 'It was a pleasant walk through the monster garden.'],
+      ['lovely', 'beautiful and enjoyable', 'The monster planted lovely purple flowers.'],
+      ['delightful', 'full of fun and joy', 'The monster’s tea party was delightful.'],
+      ['enjoyable', 'fun to do', 'Flying kites with the monster was enjoyable.'],
+      ['cozy', 'warm, snug, and comfy', 'The monster’s cave was cozy and warm.'],
+      ['charming', 'so nice you can’t help liking it', 'The monster lived in a charming little cottage.'],
+    ]},
+  ]},
+
+  scary: { forms: 'scarier scariest', words: [
+    ['terrifying', 'so scary you want to run', 'The monster let out a terrifying roar.'],
+    ['frightening', 'making you feel afraid', 'A frightening face appeared at the window.'],
+    ['creepy', 'strange and scary in a way that gives you shivers', 'The creepy doll’s eyes followed us.'],
+    ['spooky', 'scary like a ghost story', 'The old house looked spooky in the fog.'],
+    ['eerie', 'strange and scary, like something is not right', 'An eerie glow came from the swamp.'],
+    ['chilling', 'so scary it makes you feel cold', 'We heard a chilling howl in the woods.'],
+    ['horrifying', 'so scary it shocks you', 'The monster’s teeth were a horrifying sight.'],
+    ['hair-raising', 'so scary it makes your hair stand up', 'The ride down the dark tunnel was hair-raising.'],
+    ['menacing', 'looking like it might hurt you', 'The monster gave a menacing growl.'],
+    ['sinister', 'evil and scary-looking', 'A sinister shadow slid under the door.'],
+  ]},
+
+  scared: { forms: 'scare', words: [
+    ['afraid', 'feeling fear', 'Mia was afraid of the dark closet.'],
+    ['frightened', 'filled with fear', 'The frightened kitten hid under the bed.'],
+    ['terrified', 'very, very scared', 'Leo was terrified when the lights went out.'],
+    ['nervous', 'worried that something bad will happen', 'The nervous monster bit its claws.'],
+    ['petrified', 'so scared you can’t move', 'I stood petrified as the monster came closer.'],
+    ['jumpy', 'scared and quick to jump at sounds', 'The creaky house made everyone jumpy.'],
+    ['panicked', 'so scared you can’t think clearly', 'The panicked monster ran in circles.'],
+    ['uneasy', 'a little worried, like something is wrong', 'Mia felt uneasy in the quiet forest.'],
+    ['spooked', 'suddenly scared by something', 'The horse got spooked by the monster’s sneeze.'],
+  ]},
+
+  happy: { words: [
+    ['joyful', 'full of joy', 'The joyful monster danced in the rain.'],
+    ['cheerful', 'happy and smiling', 'A cheerful monster whistled while it worked.'],
+    ['delighted', 'very pleased and happy', 'Mia was delighted to meet a friendly monster.'],
+    ['thrilled', 'super excited and happy', 'The monster was thrilled to get a birthday card.'],
+    ['glad', 'pleased about something', 'Leo was glad the monster was nice.'],
+    ['overjoyed', 'so happy you could burst', 'The monster was overjoyed to find its lost teddy.'],
+    ['jolly', 'happy and full of fun', 'A jolly monster told jokes all night.'],
+    ['gleeful', 'happy in a giggly, excited way', 'The monster gave a gleeful squeal.'],
+    ['pleased', 'happy with how something went', 'The monster looked pleased with its sandcastle.'],
+    ['ecstatic', 'as happy as you can get', 'The team was ecstatic when they won.'],
+  ]},
+
+  sad: { words: [
+    ['unhappy', 'not happy', 'The unhappy monster sat alone on the swing.'],
+    ['gloomy', 'sad and dark, like a rainy day', 'The monster felt gloomy after losing the game.'],
+    ['miserable', 'very sad and uncomfortable', 'The soaking wet monster felt miserable.'],
+    ['heartbroken', 'so sad it feels like your heart hurts', 'Mia was heartbroken when the monster moved away.'],
+    ['upset', 'sad or bothered about something', 'Leo was upset that no one listened.'],
+    ['glum', 'quiet and sad', 'The monster looked glum when the picnic was rained out.'],
+    ['tearful', 'sad and close to crying', 'The tearful monster waved goodbye.'],
+    ['blue', 'feeling a little sad', 'The monster felt blue without its friends.'],
+    ['mopey', 'sad and slow, not wanting to do anything', 'The mopey monster dragged its feet.'],
+    ['sorrowful', 'full of deep sadness', 'A sorrowful song drifted from the cave.'],
+  ]},
+
+  mad: { words: [
+    ['angry', 'feeling mad', 'The angry monster stomped its feet.'],
+    ['furious', 'super angry', 'The monster was furious when someone stole its cookie.'],
+    ['grumpy', 'cranky and in a bad mood', 'The grumpy monster growled at the alarm clock.'],
+    ['cranky', 'grouchy and easy to upset', 'The monster gets cranky before breakfast.'],
+    ['fuming', 'so angry you might steam', 'Leo was fuming after his tower got knocked over.'],
+    ['annoyed', 'a little mad or bothered', 'The monster was annoyed by the buzzing fly.'],
+    ['irritated', 'bothered and getting mad', 'The itchy sweater made the monster irritated.'],
+    ['enraged', 'filled with anger', 'The enraged monster smashed the fence.'],
+    ['grouchy', 'in a bad, crabby mood', 'Grandpa Monster is grouchy in the morning.'],
+    ['livid', 'extremely angry', 'The queen was livid about her broken crown.'],
+  ]},
+
+  pretty: { words: [
+    ['beautiful', 'very pretty to look at', 'The monster had beautiful, shiny scales.'],
+    ['lovely', 'pretty and pleasant', 'She wore a lovely dress to the monster ball.'],
+    ['gorgeous', 'super beautiful', 'The sunset over the swamp was gorgeous.'],
+    ['stunning', 'so pretty it makes you stare', 'The dragon’s stunning wings sparkled.'],
+    ['cute', 'pretty in a sweet, small way', 'The baby monster had a cute button nose.'],
+    ['adorable', 'so cute you want to hug it', 'The adorable monster wagged its tail.'],
+    ['elegant', 'pretty in a fancy, graceful way', 'The elegant monster sipped tea with its pinky up.'],
+    ['dazzling', 'so bright and pretty it almost hurts to look', 'The crown was covered in dazzling jewels.'],
+    ['sparkling', 'shining with tiny flashes of light', 'The monster’s sparkling eyes glowed.'],
+  ]},
+
+  ugly: { words: [
+    ['hideous', 'terribly ugly', 'The troll had a hideous, warty nose.'],
+    ['grotesque', 'ugly in a strange, twisted way', 'Grotesque statues lined the castle wall.'],
+    ['unsightly', 'not nice to look at', 'An unsightly stain covered the monster’s shirt.'],
+    ['ghastly', 'shockingly ugly or scary', 'The ghost had a ghastly, pale face.'],
+    ['revolting', 'so gross it makes you want to look away', 'The monster’s lunch looked revolting.'],
+    ['lumpy', 'covered in bumps and lumps', 'The monster had a lumpy, green head.'],
+    ['warty', 'covered in warts', 'A warty toad sat on the monster’s head.'],
+    ['frightful', 'ugly enough to scare you', 'The witch wore a frightful mask.'],
+    ['gnarly', 'twisted and knobby', 'The monster had gnarly, crooked fingers.'],
+  ]},
+
+  fast: { words: [
+    ['quick', 'moving fast', 'The quick monster grabbed the ball first.'],
+    ['speedy', 'very fast', 'A speedy monster zoomed past the bus.'],
+    ['swift', 'fast and smooth', 'With one swift move, the monster caught the frisbee.'],
+    ['rapid', 'happening very fast', 'The monster heard rapid footsteps behind it.'],
+    ['zippy', 'quick and full of energy', 'The zippy little monster raced around the yard.'],
+    ['lightning-fast', 'as fast as lightning', 'The cat made a lightning-fast leap.'],
+    ['brisk', 'quick and lively', 'We took a brisk walk past the monster’s cave.'],
+    ['nimble', 'quick and light on your feet', 'The nimble monster tiptoed across the rocks.'],
+    ['hurried', 'done fast because you are in a rush', 'Mia took a hurried look over her shoulder.'],
+  ]},
+
+  slow: { words: [
+    ['sluggish', 'slow and low on energy', 'The sleepy monster felt sluggish.'],
+    ['poky', 'annoyingly slow', 'The poky turtle took all day to cross the road.'],
+    ['leisurely', 'slow and relaxed, with no hurry', 'The monster took a leisurely stroll.'],
+    ['unhurried', 'taking your time', 'The monster ate its breakfast with unhurried bites.'],
+    ['gradual', 'happening a little at a time', 'A gradual smile spread across the monster’s face.'],
+    ['plodding', 'moving slowly with heavy steps', 'We heard the monster’s plodding footsteps.'],
+    ['snail-like', 'as slow as a snail', 'The line moved at a snail-like pace.'],
+    ['lazy', 'not wanting to move or work', 'A lazy monster napped all afternoon.'],
+    ['creeping', 'moving slowly and quietly', 'A creeping fog rolled over the hill.'],
+  ]},
+
+  loud: { words: [
+    ['noisy', 'full of loud sounds', 'The noisy monsters partied all night.'],
+    ['booming', 'deep and loud, like a drum', 'The monster spoke in a booming voice.'],
+    ['thunderous', 'as loud as thunder', 'A thunderous roar shook the trees.'],
+    ['deafening', 'so loud you can’t hear anything else', 'The crash was deafening.'],
+    ['ear-splitting', 'so loud it hurts your ears', 'The monster let out an ear-splitting scream.'],
+    ['blaring', 'loud and harsh, like a car horn', 'Blaring music came from the monster’s room.'],
+    ['rowdy', 'loud and wild', 'The rowdy monsters jumped on the beds.'],
+    ['piercing', 'high and sharp enough to hurt your ears', 'A piercing whistle echoed through the cave.'],
+    ['rumbling', 'deep and shaking', 'We heard a rumbling sound under the floor.'],
+  ]},
+
+  quiet: { words: [
+    ['silent', 'making no sound at all', 'The forest went silent.'],
+    ['hushed', 'very quiet, like everyone is whispering', 'The kids spoke in hushed voices.'],
+    ['soft', 'gentle and not loud', 'The monster hummed a soft song.'],
+    ['still', 'not moving or making noise', 'The lake was still and dark.'],
+    ['peaceful', 'calm and quiet', 'The monster’s cave was peaceful at night.'],
+    ['muffled', 'quiet because something covers the sound', 'We heard a muffled thump inside the closet.'],
+    ['calm', 'quiet and relaxed', 'The calm monster floated on the lake.'],
+    ['whispery', 'soft like a whisper', 'The ghost had a whispery voice.'],
+    ['soundless', 'with no sound at all', 'The monster took soundless steps across the rug.'],
+  ]},
+
+  cold: { senses: [
+    { label: 'chilly', icon: '🥶', words: [
+      ['chilly', 'a little bit cold', 'It was a chilly night in the woods.'],
+      ['freezing', 'so cold that water turns to ice', 'The monster’s cave was freezing.'],
+      ['frosty', 'very cold and covered with frost', 'The monster drew on the frosty window.'],
+      ['icy', 'as cold as ice', 'An icy wind blew through the trees.'],
+      ['frozen', 'turned hard from the cold', 'The monster skated on the frozen pond.'],
+      ['bitter', 'painfully cold', 'The bitter wind stung our faces.'],
+      ['frigid', 'extremely cold', 'The frigid water made the monster shiver.'],
+    ]},
+    { label: 'unfriendly', icon: '😒', words: [
+      ['unfriendly', 'not nice or welcoming', 'The unfriendly troll slammed the door.'],
+      ['icy', 'cold and unfriendly', 'The queen gave the monster an icy stare.'],
+      ['frosty', 'unfriendly in a cold way', 'The cat gave the dog a frosty look.'],
+      ['stony', 'hard and showing no feelings', 'The guard kept a stony face.'],
+      ['distant', 'acting far away and not friendly', 'The new monster seemed distant.'],
+      ['heartless', 'having no kindness at all', 'The heartless giant laughed at the crying kids.'],
+    ]},
+  ]},
+
+  hot: { senses: [
+    { label: 'burning', icon: '🔥', words: [
+      ['boiling', 'hot enough to bubble', 'The witch stirred a boiling pot of soup.'],
+      ['scorching', 'so hot it could burn', 'The sun was scorching in the desert.'],
+      ['blazing', 'burning bright and hot', 'The dragon breathed a blazing flame.'],
+      ['sizzling', 'so hot it makes a hissing sound', 'The monster cooked sizzling bacon.'],
+      ['steaming', 'so hot that steam rises', 'Mia sipped a steaming cup of cocoa.'],
+      ['sweltering', 'hot and sticky', 'It was a sweltering day at the beach.'],
+      ['burning', 'on fire or very hot', 'The burning sand made the monster hop.'],
+      ['toasty', 'nice and warm', 'The monster’s fur kept Leo toasty.'],
+    ]},
+    { label: 'spicy', icon: '🌶️', words: [
+      ['spicy', 'full of flavor that burns your mouth', 'The monster loved spicy tacos.'],
+      ['fiery', 'so spicy it feels like fire', 'The fiery salsa made the monster’s eyes water.'],
+      ['peppery', 'tasting like lots of pepper', 'The peppery soup made the monster sneeze.'],
+      ['zesty', 'full of strong, lively flavor', 'The monster dipped chips in zesty salsa.'],
+      ['tingly', 'making your mouth tingle', 'The tingly candy fizzed on the monster’s tongue.'],
+    ]},
+  ]},
+
+  weird: { words: [
+    ['strange', 'not normal or usual', 'A strange noise came from the attic.'],
+    ['odd', 'a little strange', 'The monster had an odd way of walking.'],
+    ['bizarre', 'really, really strange', 'It was a bizarre sight: a monster riding a bike.'],
+    ['peculiar', 'strange in a way you can’t explain', 'The soup was a peculiar shade of purple.'],
+    ['unusual', 'not common; different from normal', 'The monster had an unusual pet: a talking rock.'],
+    ['wacky', 'silly and strange', 'The monster wore a wacky hat.'],
+    ['mysterious', 'strange and hard to explain', 'A mysterious box sat on the doorstep.'],
+    ['quirky', 'different in a fun way', 'The quirky monster collected spoons.'],
+    ['freaky', 'weird in a creepy way', 'The freaky doll blinked at us.'],
+    ['funky', 'strange in a fun or smelly way', 'A funky smell came from the fridge.'],
+  ]},
+
+  old: { senses: [
+    { label: 'a thing', icon: '🏚️', words: [
+      ['ancient', 'very, very old', 'The monster found an ancient map.'],
+      ['crumbling', 'breaking into little pieces from age', 'The monster lived in a crumbling castle.'],
+      ['dusty', 'covered in dust', 'A dusty book sat on the shelf.'],
+      ['rusty', 'covered with orange-brown rust', 'The rusty gate creaked open.'],
+      ['worn-out', 'used so much it’s falling apart', 'The monster wore worn-out sneakers.'],
+      ['antique', 'old and special, from long ago', 'Grandma kept an antique clock.'],
+      ['tattered', 'old and torn into rags', 'A tattered flag flapped in the wind.'],
+      ['creaky', 'old and squeaky when it moves', 'We climbed the creaky stairs.'],
+    ]},
+    { label: 'a person', icon: '👵', words: [
+      ['elderly', 'old, used for people', 'An elderly monster sat on the porch.'],
+      ['aged', 'having lived a long time', 'The aged wizard leaned on his staff.'],
+      ['gray-haired', 'with hair turned gray from age', 'A gray-haired troll guarded the bridge.'],
+      ['wrinkly', 'covered in wrinkles', 'The wrinkly old monster smiled.'],
+      ['ancient', 'very, very old', 'The ancient dragon was a thousand years old.'],
+      ['wise', 'smart from living a long time', 'The wise old owl gave Mia advice.'],
+    ]},
+  ]},
+
+  funny: { senses: [
+    { label: 'silly', icon: '😂', words: [
+      ['hilarious', 'so funny you can’t stop laughing', 'The monster told a hilarious joke.'],
+      ['silly', 'goofy and not serious', 'The monster made a silly face.'],
+      ['goofy', 'silly in a clumsy, fun way', 'The goofy monster tripped over its own tail.'],
+      ['comical', 'funny to watch', 'The monster’s tiny hat looked comical.'],
+      ['amusing', 'making you smile or laugh', 'Mia found the monster’s dance amusing.'],
+      ['hysterical', 'so funny you laugh like crazy', 'The pie fight was hysterical.'],
+      ['witty', 'funny in a clever way', 'The witty monster always had a joke ready.'],
+    ]},
+    { label: 'strange', icon: '🤔', words: [
+      ['strange', 'not normal or usual', 'A strange noise came from the attic.'],
+      ['odd', 'a little strange', 'The monster had an odd way of walking.'],
+      ['peculiar', 'strange in a way you can’t explain', 'The soup was a peculiar shade of purple.'],
+      ['curious', 'strange and making you want to know more', 'A curious light blinked in the attic.'],
+      ['fishy', 'strange in a way that seems not right', 'Something fishy was going on in the cave.'],
+      ['mysterious', 'strange and hard to explain', 'A mysterious box sat on the doorstep.'],
+    ]},
+  ]},
+
+  smart: { words: [
+    ['clever', 'quick at thinking and figuring things out', 'The clever monster hid behind the curtain.'],
+    ['brilliant', 'super smart', 'Leo had a brilliant idea.'],
+    ['bright', 'smart and quick to learn', 'The bright monster learned to read in a day.'],
+    ['wise', 'smart from knowing a lot about life', 'The wise old monster knew every path in the forest.'],
+    ['brainy', 'full of brains; very smart', 'The brainy monster built a robot.'],
+    ['sharp', 'quick to notice and understand', 'Mia’s sharp eyes spotted the footprint.'],
+    ['intelligent', 'able to learn and think well', 'The intelligent monster solved the puzzle.'],
+    ['gifted', 'born with a special talent', 'The gifted monster could paint with its tail.'],
+    ['genius', 'amazingly smart', 'Building a slime cannon was a genius plan!'],
+  ]},
+
+  dark: { words: [
+    ['gloomy', 'dark and sad-feeling', 'The gloomy hallway went on forever.'],
+    ['shadowy', 'full of shadows', 'Something moved in the shadowy corner.'],
+    ['dim', 'with only a little light', 'The cave was dim and damp.'],
+    ['murky', 'dark and hard to see through', 'The monster rose out of the murky water.'],
+    ['pitch-black', 'so dark you can’t see anything', 'The closet was pitch-black.'],
+    ['inky', 'dark like spilled ink', 'Stars sparkled in the inky sky.'],
+    ['shady', 'dark and cool, out of the sun', 'The monster napped in a shady spot.'],
+    ['moonless', 'dark with no moon in the sky', 'It was a moonless night.'],
+    ['unlit', 'with no lights on', 'We tiptoed down the unlit stairs.'],
+  ]},
+
+  tired: { words: [
+    ['sleepy', 'ready to fall asleep', 'The sleepy monster yawned a giant yawn.'],
+    ['exhausted', 'super tired, with no energy left', 'After the long hike, Mia was exhausted.'],
+    ['worn-out', 'tired from doing a lot', 'The worn-out monster flopped on the couch.'],
+    ['drowsy', 'heavy-eyed and almost asleep', 'The warm fire made the monster drowsy.'],
+    ['weary', 'tired from working a long time', 'The weary knight rested by the river.'],
+    ['drained', 'all used up, like a battery', 'Leo felt drained after the big test.'],
+    ['droopy', 'tired and sagging', 'The monster’s droopy eyes began to close.'],
+    ['groggy', 'sleepy and foggy, like you just woke up', 'The groggy monster bumped into the wall.'],
+  ]},
+
+  strong: { words: [
+    ['powerful', 'full of strength', 'The powerful monster lifted a car.'],
+    ['mighty', 'very strong and powerful', 'The mighty dragon flapped its wings.'],
+    ['muscular', 'with big, strong muscles', 'The muscular monster flexed its arms.'],
+    ['tough', 'strong and hard to hurt', 'The tough monster didn’t even blink.'],
+    ['sturdy', 'strong and hard to break', 'We built a sturdy fort.'],
+    ['burly', 'big and strong', 'A burly troll guarded the bridge.'],
+    ['brawny', 'big and full of muscles', 'The brawny monster chopped wood all day.'],
+    ['unbreakable', 'too strong to break', 'The monster’s cage was unbreakable.'],
+    ['rugged', 'tough and built for hard work', 'Mia’s rugged boots crossed the rocky hill.'],
+  ]},
+
+  smelly: { words: [
+    ['stinky', 'smelling bad', 'The monster had stinky feet.'],
+    ['reeking', 'smelling really, really bad', 'The reeking garbage made us gag.'],
+    ['foul', 'smelling or tasting really bad', 'A foul smell came from under the bed.'],
+    ['musty', 'smelling old and damp', 'The basement smelled musty.'],
+    ['putrid', 'smelling rotten', 'A putrid smell rose from the swamp.'],
+    ['funky', 'smelling strange', 'Leo’s gym bag had a funky smell.'],
+    ['pungent', 'having a strong, sharp smell', 'The monster cooked pungent onion soup.'],
+    ['rotten', 'smelling like spoiled food', 'The fridge smelled like rotten eggs.'],
+  ]},
+
+  said: { forms: 'say says saying', words: [
+    ['whispered', 'said very softly', '“Who’s there?” Mia whispered.'],
+    ['shouted', 'said very loudly', '“Run!” Leo shouted.'],
+    ['muttered', 'said quietly, almost to yourself', '“I hate broccoli,” the monster muttered.'],
+    ['exclaimed', 'said with surprise or excitement', '“Look at that!” Mia exclaimed.'],
+    ['replied', 'said back as an answer', '“Yes, please,” the monster replied.'],
+    ['gasped', 'said with a quick, surprised breath', '“It’s huge!” Leo gasped.'],
+    ['groaned', 'said with a long, unhappy sound', '“Not again,” the monster groaned.'],
+    ['growled', 'said in a low, rough, angry voice', '“Go away,” the monster growled.'],
+    ['announced', 'said something big for everyone to hear', '“Dinner is ready!” the monster announced.'],
+    ['giggled', 'said with a little laugh', '“That tickles!” the monster giggled.'],
+    ['stammered', 'said in a nervous, stop-and-start way', '“I-I-I didn’t do it,” Leo stammered.'],
+    ['explained', 'said how or why something works', '“Monsters only come out at night,” Mia explained.'],
+  ]},
+
+  went: { forms: 'go goes going gone', words: [
+    ['traveled', 'went from one place to another', 'The monster traveled across the ocean.'],
+    ['headed', 'went toward a place', 'We headed into the dark forest.'],
+    ['hurried', 'went quickly', 'Mia hurried home before dark.'],
+    ['wandered', 'went around without a plan', 'The lost monster wandered through the mall.'],
+    ['marched', 'walked with strong, even steps', 'The monsters marched into town.'],
+    ['journeyed', 'went on a long trip', 'They journeyed over the mountains.'],
+    ['crept', 'went slowly and quietly', 'Leo crept down the stairs.'],
+    ['rushed', 'went in a big hurry', 'The monster rushed to the rescue.'],
+    ['zoomed', 'went super fast', 'The monster zoomed past on a skateboard.'],
+    ['ventured', 'went somewhere new and a little risky', 'Mia ventured into the cave.'],
+  ]},
+
+  walked: { forms: 'walk walks walking', words: [
+    ['lumbered', 'walked in a slow, heavy, clumsy way', 'The monster lumbered across the bridge.'],
+    ['strolled', 'walked slowly, just for fun', 'Mia strolled through the park.'],
+    ['stomped', 'walked with loud, heavy steps', 'The angry monster stomped up the stairs.'],
+    ['tiptoed', 'walked quietly on your toes', 'Leo tiptoed past the sleeping monster.'],
+    ['marched', 'walked with strong, even steps', 'The monster marched into the classroom.'],
+    ['trudged', 'walked slowly because you were tired', 'We trudged through the deep snow.'],
+    ['shuffled', 'walked by sliding your feet', 'The sleepy monster shuffled to the kitchen.'],
+    ['wandered', 'walked around without a plan', 'The lost monster wandered through the mall.'],
+    ['paced', 'walked back and forth, often worried', 'The monster paced outside the door.'],
+    ['strutted', 'walked proudly, showing off', 'The monster strutted in its new sneakers.'],
+    ['waddled', 'walked with short steps, rocking side to side', 'The round little monster waddled like a duck.'],
+    ['hiked', 'took a long walk in nature', 'We hiked up Monster Mountain.'],
+  ]},
+
+  ran: { forms: 'run runs running', words: [
+    ['dashed', 'ran fast for a short way', 'Mia dashed to the door.'],
+    ['raced', 'ran as fast as you can', 'The monster raced up the hill.'],
+    ['sprinted', 'ran at top speed', 'Leo sprinted away from the monster.'],
+    ['bolted', 'ran off suddenly', 'The scared cat bolted under the bed.'],
+    ['scurried', 'ran with quick, little steps', 'A tiny monster scurried across the floor.'],
+    ['darted', 'ran quickly in a sudden direction', 'The monster darted behind a tree.'],
+    ['galloped', 'ran with big, bouncy steps like a horse', 'The monster galloped across the field.'],
+    ['scampered', 'ran in a quick, playful way', 'The baby monsters scampered outside.'],
+    ['fled', 'ran away from danger', 'The villagers fled when they saw the dragon.'],
+    ['zoomed', 'ran super fast', 'The monster zoomed around the track.'],
+    ['charged', 'ran hard right at something', 'The monster charged at the door.'],
+  ]},
+
+  looked: { forms: 'look looks looking', words: [
+    ['stared', 'looked at something for a long time', 'Mia stared at the giant footprint.'],
+    ['gazed', 'looked calmly for a long time', 'The monster gazed at the stars.'],
+    ['peeked', 'took a quick, sneaky look', 'Leo peeked under the bed.'],
+    ['peered', 'looked closely, trying to see', 'The monster peered through the foggy window.'],
+    ['glanced', 'took a very quick look', 'Mia glanced over her shoulder.'],
+    ['glared', 'looked at someone in an angry way', 'The monster glared at the noisy crow.'],
+    ['squinted', 'looked with your eyes partly shut', 'The monster squinted at the bright sun.'],
+    ['gawked', 'stared with your mouth hanging open', 'Everyone gawked at the dancing monster.'],
+    ['examined', 'looked very carefully at every part', 'Leo examined the strange slime.'],
+    ['searched', 'looked everywhere for something', 'We searched the attic for the monster.'],
+  ]},
+
+  saw: { forms: 'see sees seeing seen', words: [
+    ['noticed', 'saw something and paid attention', 'Mia noticed claw marks on the door.'],
+    ['spotted', 'saw something that was hard to find', 'Leo spotted the monster behind the tree.'],
+    ['spied', 'saw something secretly', 'We spied a monster in the garden.'],
+    ['glimpsed', 'saw something for just a second', 'I glimpsed a tail around the corner.'],
+    ['watched', 'looked at something for a while', 'The kids watched the monster dance.'],
+    ['witnessed', 'saw something important happen', 'Mia witnessed the monster’s first flight.'],
+    ['observed', 'watched carefully', 'Leo observed the monster eating lunch.'],
+    ['discovered', 'found or saw for the first time', 'We discovered a hidden monster cave.'],
+    ['recognized', 'saw and knew who it was', 'Mia recognized the monster from her dream.'],
+  ]},
+
+  got: { forms: 'get gets getting gotten', senses: [
+    { label: 'received', icon: '🎁', words: [
+      ['received', 'got something someone gave you', 'The monster received a birthday card.'],
+      ['earned', 'got something by working for it', 'Mia earned a gold star.'],
+      ['won', 'got a prize for coming in first', 'The monster won a giant trophy.'],
+      ['collected', 'got and kept a group of things', 'The monster collected shiny rocks.'],
+      ['found', 'got something you were looking for', 'Leo found the lost key.'],
+      ['fetched', 'went and brought something back', 'The monster fetched a bucket of water.'],
+      ['gathered', 'got things and brought them together', 'We gathered sticks for the fire.'],
+    ]},
+    { label: 'became', icon: '🔄', words: [
+      ['became', 'started to be', 'The sky became dark.'],
+      ['grew', 'slowly became', 'The monster grew sleepy.'],
+      ['turned', 'changed into', 'Leo’s face turned pale.'],
+      ['felt', 'had a feeling', 'Mia felt nervous.'],
+    ]},
+  ]},
+
+  ate: { forms: 'eat eats eating eaten', words: [
+    ['gobbled', 'ate quickly in big bites', 'The monster gobbled the whole pizza.'],
+    ['munched', 'ate with loud chewing', 'The monster munched on carrots.'],
+    ['chomped', 'bit down hard', 'The monster chomped into the apple.'],
+    ['devoured', 'ate every bit, super fast', 'The hungry monster devoured the cake.'],
+    ['nibbled', 'ate in tiny bites', 'The shy monster nibbled a cracker.'],
+    ['gulped', 'swallowed quickly in big mouthfuls', 'The monster gulped down the milk.'],
+    ['slurped', 'ate or drank with a loud sucking sound', 'The monster slurped its noodles.'],
+    ['crunched', 'ate with a crackly sound', 'Leo crunched on a crispy chip.'],
+    ['chewed', 'mashed food with your teeth', 'The monster chewed its gum loudly.'],
+    ['feasted', 'ate a big, special meal', 'The monsters feasted on pie and pudding.'],
+    ['snacked', 'ate a little food between meals', 'Mia snacked on popcorn.'],
+  ]},
+
+  made: { forms: 'make makes making', words: [
+    ['built', 'made by putting parts together', 'The monster built a tree house.'],
+    ['created', 'made something new', 'Mia created a monster out of clay.'],
+    ['crafted', 'made carefully by hand', 'Leo crafted a mask from paper plates.'],
+    ['invented', 'made something no one had made before', 'The monster invented a tickle machine.'],
+    ['designed', 'planned how something would look or work', 'We designed a trap for the monster.'],
+    ['constructed', 'built something big', 'The monsters constructed a giant bridge.'],
+    ['cooked', 'made food using heat', 'The monster cooked worm spaghetti.'],
+    ['baked', 'cooked in an oven', 'Mia baked cookies for the monster.'],
+    ['shaped', 'made into a certain form', 'The monster shaped the snow into a castle.'],
+    ['assembled', 'put the pieces together', 'Leo assembled the robot.'],
+  ]},
+
+  liked: { forms: 'like likes liking', words: [
+    ['loved', 'liked a whole lot', 'The monster loved bubble baths.'],
+    ['enjoyed', 'had fun with', 'Mia enjoyed the monster’s jokes.'],
+    ['adored', 'loved with all your heart', 'The baby adored the fluffy monster.'],
+    ['admired', 'looked up to; thought highly of', 'Leo admired the brave monster.'],
+    ['treasured', 'kept as something very special', 'The monster treasured its old teddy bear.'],
+    ['cherished', 'loved and took care of', 'She cherished the monster’s drawing.'],
+    ['appreciated', 'was thankful for', 'The monster appreciated the warm blanket.'],
+    ['craved', 'wanted very much', 'The monster craved chocolate.'],
+  ]},
+
+  yelled: { forms: 'yell yells yelling', words: [
+    ['shouted', 'said very loudly', '“Run!” Leo shouted.'],
+    ['screamed', 'yelled in a high, loud voice', 'Leo screamed when the lights went out.'],
+    ['hollered', 'yelled to someone far away', 'Mia hollered across the field.'],
+    ['bellowed', 'yelled in a deep, loud voice', '“Who’s in my cave?” the monster bellowed.'],
+    ['roared', 'yelled like a lion', 'The monster roared at the thunder.'],
+    ['shrieked', 'yelled in a very high, sharp voice', 'Mia shrieked when she saw the spider.'],
+    ['howled', 'yelled with a long, wild cry', 'The monster howled at the moon.'],
+    ['boomed', 'said in a deep, loud voice', '“Welcome!” the giant boomed.'],
+    ['squealed', 'yelled in a high, happy or scared voice', 'The kids squealed with joy.'],
+  ]},
+
+  cried: { forms: 'cry cries crying', words: [
+    ['sobbed', 'cried hard with big breaths', 'The monster sobbed into its pillow.'],
+    ['wept', 'cried quietly with tears', 'Mia wept at the end of the movie.'],
+    ['bawled', 'cried loudly like a baby', 'The baby monster bawled for its bottle.'],
+    ['whimpered', 'cried with soft, small sounds', 'The puppy whimpered in the dark.'],
+    ['sniffled', 'cried with a runny nose', 'Leo sniffled as he waved goodbye.'],
+    ['wailed', 'cried with a long, loud sound', 'The ghost wailed all night.'],
+    ['blubbered', 'cried messily while trying to talk', '“I lost my hat!” the monster blubbered.'],
+    ['moaned', 'made a long, sad sound', 'The lonely monster moaned in its cave.'],
+  ]},
+
+  laughed: { forms: 'laugh laughs laughing', words: [
+    ['giggled', 'laughed in a light, silly way', 'The kids giggled at the monster’s dance.'],
+    ['chuckled', 'laughed quietly', 'Grandpa chuckled at the joke.'],
+    ['cackled', 'laughed in a sharp, witchy way', 'The witch cackled over her pot.'],
+    ['snickered', 'laughed in a sneaky, mean way', 'The bullies snickered behind the monster’s back.'],
+    ['howled', 'laughed really hard and loud', 'We howled at the monster’s joke.'],
+    ['snorted', 'laughed with a noise through your nose', 'Mia snorted milk out of her nose!'],
+    ['chortled', 'laughed in a happy, bubbly way', 'The monster chortled with glee.'],
+    ['guffawed', 'laughed loudly with your whole body', 'The giant guffawed so hard the ground shook.'],
+    ['roared', 'laughed super loudly', 'The crowd roared at the monster’s silly hat.'],
+  ]},
+
+  grabbed: { forms: 'grab grabs grabbing', words: [
+    ['snatched', 'grabbed quickly', 'The monster snatched the last cookie.'],
+    ['seized', 'grabbed suddenly and firmly', 'The monster seized Leo’s backpack.'],
+    ['grasped', 'held tightly in your hand', 'Mia grasped the rope.'],
+    ['clutched', 'held tight, often because you were scared', 'Leo clutched his teddy bear.'],
+    ['gripped', 'held on very tightly', 'The monster gripped the steering wheel.'],
+    ['yanked', 'pulled hard and fast', 'Mia yanked the blanket off the monster.'],
+    ['scooped', 'picked up with a curved hand', 'The monster scooped up the kitten.'],
+    ['nabbed', 'grabbed and caught quickly', 'The monster nabbed the frisbee in midair.'],
+    ['plucked', 'pulled off quickly', 'The monster plucked an apple from the tree.'],
+    ['snagged', 'caught or grabbed quickly', 'Leo snagged the last slice of pizza.'],
+  ]},
+
+  jumped: { forms: 'jump jumps jumping', words: [
+    ['leaped', 'jumped high or far', 'The monster leaped over the fence.'],
+    ['hopped', 'jumped in small, bouncy jumps', 'The little monster hopped like a bunny.'],
+    ['bounced', 'jumped up and down', 'The kids bounced on the monster’s belly.'],
+    ['sprang', 'jumped up suddenly', 'The monster sprang out of the closet!'],
+    ['bounded', 'ran with big leaps', 'The dog bounded across the yard.'],
+    ['pounced', 'jumped on something to catch it', 'The monster pounced on the ball.'],
+    ['vaulted', 'jumped over something using your hands', 'Leo vaulted over the log.'],
+    ['dove', 'jumped in headfirst', 'Mia dove into the lake.'],
+    ['hurdled', 'jumped over something while running', 'The monster hurdled the garden wall.'],
+    ['flinched', 'jumped a little from being scared', 'Mia flinched at the loud bang.'],
+  ]},
+
+  moved: { forms: 'move moves moving', words: [
+    ['shifted', 'moved a little to a new spot', 'The monster shifted in its chair.'],
+    ['slid', 'moved smoothly over something', 'The monster slid down the slide.'],
+    ['crept', 'moved slowly and quietly', 'A shadow crept along the wall.'],
+    ['wiggled', 'moved with quick, little twists', 'The monster wiggled its ears.'],
+    ['scooted', 'moved quickly a short way', 'Leo scooted over to make room.'],
+    ['drifted', 'moved slowly, carried by air or water', 'The monster drifted down the river.'],
+    ['glided', 'moved smoothly and easily', 'The ghost glided across the room.'],
+    ['crawled', 'moved on hands and knees', 'The baby monster crawled under the table.'],
+    ['inched', 'moved very slowly, bit by bit', 'Mia inched toward the door.'],
+    ['slithered', 'moved by sliding like a snake', 'Something slithered under the bed.'],
+    ['lurched', 'moved with a sudden jerk', 'The bus lurched forward.'],
+  ]},
+
+  hit: { forms: 'hits hitting', words: [
+    ['smacked', 'hit hard with a flat hand', 'The monster smacked the table.'],
+    ['whacked', 'hit hard with a loud sound', 'Leo whacked the piñata.'],
+    ['punched', 'hit with a fist', 'The monster punched the pillow.'],
+    ['slapped', 'hit with an open hand', 'The monster slapped at the mosquito.'],
+    ['thumped', 'hit with a dull, heavy sound', 'The monster thumped its tail on the floor.'],
+    ['bashed', 'hit very hard', 'The giant bashed the door open.'],
+    ['struck', 'hit hard', 'Lightning struck the old tree.'],
+    ['pounded', 'hit over and over', 'The monster pounded on the door.'],
+    ['bopped', 'hit lightly in a silly way', 'Mia bopped the monster on the nose.'],
+    ['tapped', 'hit very lightly', 'Something tapped on the window.'],
+  ]},
+
+  fell: { forms: 'fall falls falling fallen', words: [
+    ['tumbled', 'fell and rolled over', 'The monster tumbled down the hill.'],
+    ['tripped', 'caught your foot and fell', 'Leo tripped over the monster’s tail.'],
+    ['stumbled', 'almost fell while walking', 'Mia stumbled in the dark.'],
+    ['toppled', 'fell over from being tall or wobbly', 'The tower of blocks toppled.'],
+    ['plunged', 'fell fast and far', 'The rock plunged into the lake.'],
+    ['crashed', 'fell with a loud bang', 'The vase crashed to the floor.'],
+    ['collapsed', 'fell down suddenly from being weak or tired', 'The tired monster collapsed on the couch.'],
+    ['slipped', 'slid and fell', 'The monster slipped on a banana peel.'],
+    ['flopped', 'fell down in a loose, heavy way', 'Leo flopped onto his bed.'],
+    ['plopped', 'fell with a soft, wet sound', 'The slime plopped onto the floor.'],
+  ]},
+
+  came: { forms: 'come comes coming', words: [
+    ['arrived', 'came to a place', 'The monster arrived just in time.'],
+    ['appeared', 'came into view', 'A monster appeared in the doorway.'],
+    ['approached', 'came closer', 'The monster slowly approached.'],
+    ['returned', 'came back', 'The monster returned the next night.'],
+    ['entered', 'came into a place', 'Mia entered the dark cave.'],
+    ['emerged', 'came out of something', 'The monster emerged from the lake.'],
+    ['burst', 'came in suddenly and with force', 'The monster burst through the door.'],
+    ['neared', 'came close to', 'We neared the monster’s castle.'],
+    ['visited', 'came to see someone', 'The monster visited Mia’s school.'],
+  ]},
+
+  put: { forms: 'puts putting', words: [
+    ['placed', 'put carefully', 'Mia placed the egg in the nest.'],
+    ['set', 'put down', 'The monster set the box on the table.'],
+    ['dropped', 'let fall', 'Leo dropped his bag by the door.'],
+    ['tucked', 'put into a snug spot', 'The monster tucked the note in its pocket.'],
+    ['stuffed', 'pushed in tightly', 'The monster stuffed the cookies in its mouth.'],
+    ['shoved', 'pushed hard', 'Leo shoved his toys under the bed.'],
+    ['laid', 'put down flat', 'The monster laid the baby in the crib.'],
+    ['stacked', 'put in a pile, one on top of another', 'Mia stacked the books high.'],
+    ['slipped', 'put in quietly or secretly', 'The monster slipped a note under the door.'],
+    ['hid', 'put where no one could find it', 'The monster hid the cookie jar.'],
+  ]},
+
+  thought: { forms: 'think thinks thinking', words: [
+    ['wondered', 'thought about something you weren’t sure of', 'Mia wondered where the monster lived.'],
+    ['believed', 'thought something was true', 'Leo believed in monsters.'],
+    ['imagined', 'made a picture in your mind', 'Mia imagined a monster under her bed.'],
+    ['guessed', 'thought without knowing for sure', 'The monster guessed the answer.'],
+    ['figured', 'thought it out', 'Leo figured the monster was hungry.'],
+    ['realized', 'suddenly understood', 'Mia realized the monster was scared too.'],
+    ['remembered', 'thought back to', 'The monster remembered its first day of school.'],
+    ['pondered', 'thought about something for a long time', 'The monster pondered the riddle.'],
+    ['suspected', 'thought something might be true', 'Mia suspected the monster ate the pie.'],
+    ['decided', 'made up your mind', 'Leo decided to follow the footprints.'],
+  ]},
+
+  took: { forms: 'take takes taking taken', words: [
+    ['carried', 'held something and moved it', 'The monster carried Mia across the river.'],
+    ['borrowed', 'took something you plan to give back', 'Leo borrowed the monster’s flashlight.'],
+    ['stole', 'took something that wasn’t yours', 'The sneaky monster stole a sock.'],
+    ['grabbed', 'took quickly with your hand', 'Mia grabbed the map.'],
+    ['snatched', 'took quickly', 'The crow snatched a shiny coin.'],
+    ['picked', 'chose', 'The monster picked the biggest pumpkin.'],
+    ['brought', 'took something with you', 'Mia brought snacks for the monster.'],
+    ['swiped', 'took quickly and sneakily', 'The monster swiped a cookie from the jar.'],
+    ['accepted', 'took something that was offered', 'The monster accepted the gift.'],
+    ['removed', 'took away or off', 'The monster removed its hat.'],
+  ]},
+
+  asked: { forms: 'ask asks asking', words: [
+    ['questioned', 'asked lots of questions', 'The detective questioned the monster.'],
+    ['begged', 'asked again and again, really wanting it', '“Please let me stay up!” the monster begged.'],
+    ['pleaded', 'begged with strong feeling', '“Don’t leave me here!” Leo pleaded.'],
+    ['demanded', 'asked in a bossy, strong way', '“Give me my hat!” the monster demanded.'],
+    ['inquired', 'asked politely', '“May I come in?” the monster inquired.'],
+    ['quizzed', 'asked lots of test-like questions', 'Mia quizzed the monster on its spelling words.'],
+    ['requested', 'asked for politely', 'The monster requested more pancakes.'],
+    ['wondered', 'asked yourself', '“Where did it go?” Mia wondered.'],
+    ['invited', 'asked someone to come', 'The monster invited us to its party.'],
+  ]},
+
+  talked: { forms: 'talk talks talking', words: [
+    ['chatted', 'talked in a friendly, easy way', 'Mia and the monster chatted all afternoon.'],
+    ['gossiped', 'talked about other people’s business', 'The monsters gossiped about the new kid.'],
+    ['chattered', 'talked fast about little things', 'The excited monster chattered nonstop.'],
+    ['rambled', 'talked on and on without a point', 'The old monster rambled about its childhood.'],
+    ['babbled', 'talked fast in a way hard to understand', 'The baby monster babbled happily.'],
+    ['discussed', 'talked about something together', 'We discussed how to catch the monster.'],
+    ['argued', 'talked angrily with someone who disagrees', 'The two monsters argued over the toy.'],
+    ['spoke', 'said words out loud', 'The monster finally spoke.'],
+    ['whispered', 'talked very softly', 'We whispered so the monster wouldn’t hear.'],
+    ['explained', 'talked to help someone understand', 'Leo explained the plan.'],
+  ]},
+};
+
+const STUCK_MOVES = [
+  { label: 'Dialogue', prompt: 'Have a character say something.', example: '“Who’s there?” Mia whispered.' },
+  { label: 'Use a Sense', prompt: 'Describe a sound, smell, taste, or touch.', example: 'The cave smelled like old socks and wet dirt.' },
+  { label: 'Show a Feeling', prompt: 'Show how someone feels without naming the feeling.', example: 'Leo’s hands shook as he reached for the door.' },
+  { label: 'Action!', prompt: 'Make a character do something.', example: 'The monster slammed its tail against the wall.' },
+  { label: 'Make It Worse', prompt: 'Add a new problem.', example: 'Then the flashlight died.' },
+  { label: 'Zoom In', prompt: 'Describe one small detail up close.', example: 'One yellow claw scraped slowly across the floor.' },
+  { label: 'Ask a Question', prompt: 'Have a character wonder something.', example: 'Why was the monster crying?' },
+  { label: 'Surprise!', prompt: 'Something unexpected happens.', example: 'The monster sneezed glitter.' },
+  { label: 'Make a Choice', prompt: 'A character decides what to do.', example: 'Mia decided to follow the footprints.' },
+  { label: 'Move Ahead', prompt: 'Jump forward in time or place.', example: 'By sunrise, they reached the mountain.' },
+];
+
+// Online results are dropped if they appear here. Kept short on purpose; add to it freely.
+const BLOCKED = new Set(`
+  arse ass asshole bastard bitch bitchy bollocks boob boobs booby booze boozy breast breasts bugger butt butthole
+  cock crap crappy cunt damn damned dick dickhead dildo douche drunk drunken dyke ejaculate ejaculated erection
+  erotic fag faggot fuck fucked fucking goddamn hell hooker horny hump humping kinky lust lustful naked nazi nigga
+  nigger nude orgasm penis piss pissed porn prick pussy rape raped retard retarded screw screwed seductive sensual
+  sex sexual sexy shit shitty slut slutty spastic stoned stripper testicle tit tits titty twat vagina wank wanker whore
+`.trim().split(/\s+/));
+// Fine words, but their dated meanings (gay = happy, queer = strange) confuse kids when offered as synonyms.
+const CONFUSING = new Set(['gay', 'queer']);
+
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const rand = n => Math.floor(Math.random() * n);
+const mod = (a, n) => ((a % n) + n) % n;
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const speechOK = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+const TIMEOUT_MS = 3000;
+
+function h(tag, props = {}, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  el.append(...kids.flat().filter(k => k != null && k !== false));
+  return el;
+}
+
+function shuffled(list) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = rand(i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+// "walked in a slow way" -> "Walked in a slow way."
+function asSentence(s) {
+  s = capitalize(s.trim());
+  return /[.!?]$/.test(s) ? s : s + '.';
+}
+
+function normalize(raw) {
+  return raw.toLowerCase().replace(/[‘’]/g, "'").replace(/[^a-z' -]/g, '').trim().replace(/\s+/g, ' ');
+}
+
+function levenshtein(a, b) {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const tmp = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = tmp;
+    }
+  }
+  return row[b.length];
+}
+
+/* =====================================================================
+   Word book lookups
+   ===================================================================== */
+const entryWords = entry => entry.senses ? entry.senses.flatMap(s => s.words) : entry.words;
+
+const FORMS = new Map();       // any spelling -> built-in key
+const KNOWN_DEFS = new Map();  // any built-in replacement -> { d, e }
+for (const [key, entry] of Object.entries(WORDS)) {
+  FORMS.set(key, key);
+  for (const form of (entry.forms || '').split(' ').filter(Boolean)) FORMS.set(form, key);
+  for (const [w, d, e] of entryWords(entry)) if (!KNOWN_DEFS.has(w)) KNOWN_DEFS.set(w, { d, e });
+}
+
+// Simple forms a word might be typed in: "walking" -> walk, "grabbed" -> grab, "happier" -> happy.
+function stemCandidates(w) {
+  const out = [w];
+  const add = s => { if (s.length >= 2 && !out.includes(s)) out.push(s); };
+  for (const [suf, rep] of [['iest', 'y'], ['ies', 'y'], ['ied', 'y'], ['ier', 'y'], ['ily', 'y']]) {
+    if (w.endsWith(suf)) add(w.slice(0, -suf.length) + rep);
+  }
+  for (const suf of ['ing', 'est', 'ed', 'er', 'es', 'ly', 's']) {
+    if (!w.endsWith(suf) || w.length <= suf.length + 1) continue;
+    const base = w.slice(0, -suf.length);
+    add(base);
+    if (base.length >= 3) add(base + 'e');
+    if (/([b-df-hj-np-tv-z])\1$/.test(base)) add(base.slice(0, -1));
+  }
+  return out;
+}
+
+function findBuiltIn(word) {
+  for (const c of stemCandidates(word)) {
+    if (FORMS.has(c)) return FORMS.get(c);
+  }
+  return null;
+}
+
+// Up to 3 built-in words close in meaning (the typed word is one of their replacements) or spelling.
+function closeMatches(word) {
+  const picks = [];
+  const add = key => { if (!picks.includes(key)) picks.push(key); };
+  const stems = stemCandidates(word);
+  for (const [key, entry] of Object.entries(WORDS)) {
+    if (entryWords(entry).some(([w]) => stems.includes(w))) add(key);
+  }
+  const limit = word.length > 7 ? 3 : 2;
+  [...FORMS.entries()]
+    .map(([form, key]) => ({ key, d: levenshtein(word, form), first: form[0] === word[0] }))
+    .filter(x => x.d <= limit)
+    .sort((a, b) => a.d - b.d || b.first - a.first)
+    .forEach(x => add(x.key));
+  return picks.slice(0, 3);
+}
+
+/* =====================================================================
+   Saved lookups (localStorage)
+   ===================================================================== */
+const PREFIX = 'ys:';
+const store = {
+  get(k) {
+    try {
+      const v = localStorage.getItem(PREFIX + k);
+      return v === null ? undefined : JSON.parse(v);
+    } catch { return undefined; }
+  },
+  set(k, v) {
+    try { localStorage.setItem(PREFIX + k, JSON.stringify(v)); } catch { /* storage full or blocked */ }
+  },
+  keys() {
+    const out = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(PREFIX)) out.push(k.slice(PREFIX.length));
+      }
+    } catch { /* blocked */ }
+    return out;
+  },
+  remove(k) {
+    try { localStorage.removeItem(PREFIX + k); } catch { /* blocked */ }
+  },
+};
+
+/* =====================================================================
+   Network: every request has a hard timeout, and failure is silent
+   ===================================================================== */
+const netDot = $('#net-dot');
+const setNet = ok => netDot.classList.toggle('on', ok);
+const FINISHED = 'finished';
+
+function deadline(ms = TIMEOUT_MS) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), ms);
+  return { signal: ctl.signal, finish() { clearTimeout(timer); ctl.abort(FINISHED); } };
+}
+
+// Resolves to { ok: true, status, data } when the server answered, or { ok: false } when offline or too slow.
+async function request(url, signal) {
+  try {
+    const res = await fetch(url, { signal });
+    const data = res.ok ? await res.json() : null;
+    setNet(true);
+    return { ok: true, status: res.status, data };
+  } catch {
+    // Requests we cancelled ourselves after getting enough results say nothing about the connection.
+    if (!(signal.aborted && signal.reason === FINISHED)) setNet(false);
+    return { ok: false };
+  }
+}
+
+const POS_TAGS = ['n', 'v', 'adj', 'adv'];
+const POS_NAMES = { n: 'noun', v: 'verb', adj: 'adjective', adv: 'adverb' };
+
+function filterResults(list, word) {
+  const out = [];
+  for (const r of list || []) {
+    const w = String(r.word || '').toLowerCase();
+    if (!/^[a-z]+$/.test(w) || BLOCKED.has(w) || CONFUSING.has(w)) continue;
+    if (stemCandidates(w).includes(word) || stemCandidates(word).includes(w)) continue;
+    const tags = r.tags || [];
+    const freq = tags.find(t => t.startsWith('f:'));
+    if (!freq || parseFloat(freq.slice(2)) < 2) continue;
+    out.push({ w, tags: tags.filter(t => POS_TAGS.includes(t)), defs: r.defs || [] });
+  }
+  return out;
+}
+
+function mergeResults(a, b) {
+  const seen = new Set(a.map(r => r.w));
+  return a.concat(b.filter(r => !seen.has(r.w)));
+}
+
+// Synonyms from Datamuse. Resolves to { status: 'found' | 'none' | 'offline', results, pos }.
+async function lookupOnline(word) {
+  const dl = deadline();
+  const q = encodeURIComponent(word);
+  // md=d adds Datamuse's own short definitions, kept as a backup for when the dictionary is down.
+  const dm = params => request(`https://api.datamuse.com/words?${params}&md=fpd&max=40`, dl.signal);
+  // Fire everything at once so the whole lookup fits inside one 3-second window.
+  const synP = dm(`rel_syn=${q}`);
+  const selfP = request(`https://api.datamuse.com/words?sp=${q}&md=p&max=1`, dl.signal);
+  const mlP = dm(`ml=${q}`);
+  const trgP = dm(`rel_trg=${q}`);
+  try {
+    const syn = await synP;
+    if (!syn.ok) return { status: 'offline' };
+    const self = await selfP;
+    const me = self.ok && Array.isArray(self.data) ? self.data.find(r => r.word === word) : null;
+    const pos = me ? (me.tags || []).find(t => POS_TAGS.includes(t)) || null : null;
+
+    let results = filterResults(syn.data, word);
+    if (results.length < 4) {
+      const ml = await mlP;
+      if (ml.ok) results = mergeResults(results, filterResults(ml.data, word));
+    }
+    if (results.length < 4) {
+      const trg = await trgP;
+      if (trg.ok) results = mergeResults(results, filterResults(trg.data, word));
+    }
+    if (pos) {
+      const same = results.filter(r => r.tags.includes(pos));
+      results = same.length >= 4 ? same : same.concat(results.filter(r => !r.tags.includes(pos)));
+    }
+    results = results.slice(0, 16).map(r => {
+      const rPos = r.tags.includes(pos) ? pos : r.tags[0] || pos;
+      return { w: r.w, pos: rPos, alt: backupDefinition(r.defs, rPos) };
+    });
+    return { status: results.length ? 'found' : 'none', results, pos };
+  } finally {
+    dl.finish();
+  }
+}
+
+function firstSentence(text) {
+  const clean = String(text).replace(/^\([^)]*\)\s*/, '').trim();
+  const m = clean.match(/^.*?[.!?](?=\s|$)/);
+  return asSentence(m ? m[0] : clean);
+}
+
+// Datamuse definitions look like "adj\tHaving a smooth, reflective surface."
+function backupDefinition(defs, pos) {
+  const parsed = defs.map(d => String(d).split('\t')).filter(d => d.length === 2 && d[1].trim());
+  const match = parsed.find(([p]) => p === pos) || parsed[0];
+  return match ? firstSentence(match[1]) : null;
+}
+
+function pickDefinition(entries, pos) {
+  const meanings = entries.flatMap(e => e.meanings || []);
+  const want = POS_NAMES[pos];
+  const m = (want && meanings.find(x => x.partOfSpeech === want)) || meanings[0];
+  const def = m && m.definitions && m.definitions[0];
+  if (!def || !def.definition) return { d: null };
+  return { d: firstSentence(def.definition), e: def.example ? firstSentence(def.example) : null };
+}
+
+const defInFlight = new Map();
+const defFailedAt = new Map();
+
+// Resolves to { d, e } (d is null when the dictionary has no entry), or undefined when it couldn't be reached.
+function getDefinition(word, pos) {
+  const cached = store.get('def:' + word);
+  if (cached !== undefined) return Promise.resolve(cached);
+  if (defInFlight.has(word)) return defInFlight.get(word);
+  // Don't make the kid wait through a second timeout right after one just failed.
+  if (Date.now() - (defFailedAt.get(word) || 0) < 20000) return Promise.resolve(undefined);
+  const p = (async () => {
+    const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`;
+    const dl = deadline();
+    let r = await request(url, dl.signal);
+    // The dictionary often errors on a first request and then works, so retry quick failures while time is left.
+    for (const delay of [200, 500]) {
+      if (r.ok && r.status < 500) break;
+      await wait(delay);
+      if (dl.signal.aborted) break;
+      r = await request(url, dl.signal);
+    }
+    dl.finish();
+    if (!r.ok || (r.status !== 200 && r.status !== 404)) {
+      defFailedAt.set(word, Date.now());
+      return undefined;
+    }
+    const def = r.status === 200 && Array.isArray(r.data) ? pickDefinition(r.data, pos) : { d: null };
+    store.set('def:' + word, def);
+    return def;
+  })();
+  defInFlight.set(word, p);
+  p.finally(() => defInFlight.delete(word));
+  return p;
+}
+
+async function mapLimit(items, limit, fn) {
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) await fn(items[next++]);
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+}
+
+/* =====================================================================
+   Sound (Web Audio). Muted by default for classroom use.
+   ===================================================================== */
+const Sound = {
+  muted: true,
+  ctx: null,
+  context() {
+    if (this.muted) return null;
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      this.ctx = new AC();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  },
+  tone(freq, start, dur, type = 'triangle', gain = 0.2) {
+    const ctx = this.context();
+    if (!ctx) return;
+    const t = ctx.currentTime + start;
+    const osc = ctx.createOscillator();
+    const amp = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t);
+    amp.gain.setValueAtTime(0.0001, t);
+    amp.gain.exponentialRampToValueAtTime(gain, t + 0.01);
+    amp.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(amp);
+    amp.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + dur + 0.02);
+  },
+  tick() { this.tone(1500, 0, 0.035, 'square', 0.04); },
+  land() { this.tone(660, 0, 0.2); this.tone(990, 0.12, 0.4); },
+  cheer() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, i * 0.09, 0.3)); },
+};
+
+function renderMute() {
+  for (const btn of $$('.mute-btn')) {
+    btn.textContent = Sound.muted ? '🔇' : '🔊';
+    btn.setAttribute('aria-label', Sound.muted ? 'Turn sound on' : 'Turn sound off');
+    btn.setAttribute('aria-pressed', String(!Sound.muted));
+  }
+}
+for (const btn of $$('.mute-btn')) {
+  btn.addEventListener('click', () => {
+    Sound.muted = !Sound.muted;
+    Sound.context(); // unlock audio inside the tap on iOS
+    renderMute();
+  });
+}
+
+function speak(text) {
+  if (!speechOK) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.9;
+  u.lang = 'en-US';
+  speechSynthesis.speak(u);
+}
+const stopSpeech = () => { if (speechOK) speechSynthesis.cancel(); };
+
+/* =====================================================================
+   Wheel
+   ===================================================================== */
+const SEG_COLORS = ['#FF8A80', '#FFD43B', '#69DB7C', '#74C0FC', '#B197FC', '#FFA94D', '#63E6BE', '#F783AC', '#A9E34B', '#91A7FF'];
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const C = 200, R = 186;
+
+function svg(tag, attrs) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Angles are degrees clockwise from the top, so the pointer sits at 0.
+const point = (deg, r) => {
+  const rad = (deg * Math.PI) / 180;
+  return [C + r * Math.sin(rad), C - r * Math.cos(rad)];
+};
+
+class Wheel {
+  constructor(col, onSpinRequest) {
+    col.append($('#wheel-tpl').content.cloneNode(true));
+    this.wrap = $('.wheel-wrap', col);
+    this.rotor = $('.wheel-rotor', col);
+    this.readout = h('div', { class: 'readout idle', 'aria-hidden': 'true' }, 'Tap Spin!');
+    col.append(this.readout);
+    this.labels = [];
+    this.angle = 0;
+    this.last = null;
+    this.spinning = false;
+    this.cancel = null;
+    this.wrap.addEventListener('click', onSpinRequest);
+    this.wrap.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSpinRequest(); }
+    });
+  }
+
+  setItems(labels) {
+    if (this.cancel) this.cancel();
+    this.labels = labels;
+    this.last = null;
+    this.angle = Math.random() * 360;
+    this.wrap.setAttribute('aria-label', `Wheel with ${labels.length} choices: ${labels.join(', ')}. Tap to spin.`);
+    this.render();
+    this.setAngle(this.angle);
+    this.orientLabels();
+    this.readout.textContent = 'Tap Spin!';
+    this.readout.className = 'readout idle';
+  }
+
+  render() {
+    const n = this.labels.length;
+    const seg = 360 / n;
+    this.rotor.replaceChildren();
+    this.labels.forEach((label, i) => {
+      const fill = SEG_COLORS[i % SEG_COLORS.length];
+      if (n === 1) {
+        this.rotor.append(svg('circle', { class: 'seg', cx: C, cy: C, r: R, fill }));
+      } else {
+        const [x0, y0] = point(i * seg, R);
+        const [x1, y1] = point((i + 1) * seg, R);
+        const large = seg > 180 ? 1 : 0;
+        this.rotor.append(svg('path', { class: 'seg', fill, d: `M${C} ${C} L${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1} Z` }));
+      }
+      // Radial label; orientLabels() points it whichever way reads upright.
+      const room = R * 0.86 - 40;
+      const size = Math.max(12, Math.min(28, room / (label.length * 0.6), n > 1 ? (Math.PI * R * 0.55 * 2 / n) * 0.42 : 28));
+      const text = svg('text', { class: 'seg-label', y: 0, 'dominant-baseline': 'central', 'font-size': size.toFixed(1) });
+      text.textContent = label;
+      this.rotor.append(text);
+    });
+    this.rotor.append(svg('circle', { class: 'rim', cx: C, cy: C, r: R + 3 }));
+    if (n > 1) {
+      for (let i = 0; i < n; i++) {
+        const [x, y] = point(i * seg, R + 3);
+        this.rotor.append(svg('circle', { class: 'peg', cx: x, cy: y, r: 5 }));
+      }
+    }
+  }
+
+  setAngle(a) {
+    this.rotor.style.transform = `rotate(${a}deg)`;
+  }
+
+  // Labels on the left half of the wheel would be upside down, so flip them to read from the rim inward.
+  orientLabels() {
+    const seg = 360 / this.labels.length;
+    $$('.seg-label', this.rotor).forEach((text, i) => {
+      const mid = (i + 0.5) * seg;
+      const flip = mod(mid + this.angle, 360) > 180;
+      text.setAttribute('x', (flip ? -R : R) * 0.86);
+      text.setAttribute('text-anchor', flip ? 'start' : 'end');
+      text.setAttribute('transform', `translate(${C} ${C}) rotate(${mid - 90 + (flip ? 180 : 0)})`);
+    });
+  }
+
+  // Which segment is under the pointer when the wheel is turned to angle a.
+  segmentAt(a) {
+    const n = this.labels.length;
+    return Math.floor(mod(-a, 360) / (360 / n)) % n;
+  }
+
+  // Picks the winner first, then animates so the wheel lands on it. Resolves to the index (null if cancelled).
+  spin() {
+    if (this.spinning || !this.labels.length) return Promise.resolve(null);
+    const n = this.labels.length;
+    const seg = 360 / n;
+    let idx = rand(n);
+    if (n > 1 && idx === this.last) idx = (idx + 1 + rand(n - 1)) % n; // never the same result twice in a row
+    this.last = idx;
+
+    const jitter = (Math.random() - 0.5) * seg * 0.6; // land somewhere inside the segment, not always dead center
+    const target = mod(-(idx + 0.5) * seg - jitter, 360);
+    const start = this.angle;
+    const delta = mod(target - mod(start, 360), 360);
+    this.spinning = true;
+    this.readout.className = 'readout';
+
+    return new Promise(resolve => {
+      let done = false;
+      const finish = result => {
+        if (done) return;
+        done = true;
+        this.spinning = false;
+        this.cancel = null;
+        if (result !== null) {
+          this.angle = target;
+          this.setAngle(target);
+          this.orientLabels();
+          this.readout.textContent = this.labels[idx];
+          this.readout.className = 'readout landed';
+          console.assert(this.segmentAt(target) === idx, 'wheel landed on the wrong segment');
+        }
+        resolve(result);
+      };
+
+      if (reduceMotion.matches) {
+        this.rotor.classList.add('faded');
+        const t = setTimeout(() => {
+          this.setAngle(target);
+          this.rotor.classList.remove('faded');
+          setTimeout(() => finish(idx), 220);
+        }, 200);
+        this.cancel = () => { clearTimeout(t); this.rotor.classList.remove('faded'); finish(null); };
+        return;
+      }
+
+      const end = start + (4 + rand(2)) * 360 + delta;
+      const duration = 3000 + Math.random() * 2000;
+      const t0 = performance.now();
+      let lastSeg = this.segmentAt(start);
+      let raf = 0;
+      const frame = now => {
+        const p = Math.min(1, (now - t0) / duration);
+        const a = start + (end - start) * (1 - Math.pow(1 - p, 3)); // ease-out
+        this.setAngle(a);
+        const s = this.segmentAt(a);
+        if (s !== lastSeg) {
+          lastSeg = s;
+          this.readout.textContent = this.labels[s];
+          Sound.tick();
+        }
+        if (p < 1) raf = requestAnimationFrame(frame);
+        else finish(idx);
+      };
+      raf = requestAnimationFrame(frame);
+      this.cancel = () => { cancelAnimationFrame(raf); finish(null); };
+    });
+  }
+}
+
+/* =====================================================================
+   Screens & navigation
+   ===================================================================== */
+const screens = { home: $('#home'), word: $('#word'), stuck: $('#stuck'), settings: $('#settings') };
+let navToken = 0;
+
+function go(name) {
+  navToken++;
+  closeCard();
+  stopSpeech();
+  for (const [k, el] of Object.entries(screens)) el.hidden = k !== name;
+  window.scrollTo(0, 0);
+  if (name === 'word') showView('input');
+  if (name === 'stuck') ensureStuckWheel();
+  if (name === 'settings') refreshSettings();
+}
+
+document.addEventListener('click', e => {
+  const goBtn = e.target.closest('[data-go]');
+  if (goBtn) {
+    go(goBtn.dataset.go);
+    if (goBtn.dataset.go === 'word') wordInput.focus(); // inside the tap, so iPad shows the keyboard
+    return;
+  }
+  if (e.target.closest('[data-action="new-word"]')) newWord();
+});
+
+/* ---------- Result card ---------- */
+const cardEl = $('#card');
+const cardBox = $('#card-box');
+let cardToken = 0;
+let cardReturnFocus = null;
+
+function openCard(content) {
+  cardToken++;
+  cardReturnFocus = document.activeElement;
+  cardBox.replaceChildren(content);
+  cardEl.hidden = false;
+  const title = $('#card-title', cardBox);
+  if (title) { title.setAttribute('tabindex', '-1'); title.focus({ preventScroll: true }); }
+}
+
+function closeCard() {
+  if (cardEl.hidden) return;
+  cardToken++;
+  stopSpeech();
+  cardEl.hidden = true;
+  cardBox.replaceChildren();
+  if (cardReturnFocus && document.contains(cardReturnFocus)) cardReturnFocus.focus({ preventScroll: true });
+}
+
+// The example sentence with the word in bold (whole-word match only).
+function exampleNode(sentence, word) {
+  const m = new RegExp(`(^|[^a-z])(${word.replace(/[^a-z]/gi, '\\$&')})(?![a-z])`, 'i').exec(sentence);
+  if (!m) return [sentence];
+  const i = m.index + m[1].length;
+  return [sentence.slice(0, i), h('b', {}, m[2]), sentence.slice(i + m[2].length)];
+}
+
+function confetti() {
+  if (reduceMotion.matches) return null;
+  const box = h('div', { class: 'confetti', 'aria-hidden': 'true' });
+  for (let i = 0; i < 46; i++) {
+    const s = h('span');
+    s.style.setProperty('--x', `${Math.random() * 100}%`);
+    s.style.setProperty('--c', SEG_COLORS[i % SEG_COLORS.length]);
+    s.style.setProperty('--dx', `${(Math.random() - 0.5) * 160}px`);
+    s.style.setProperty('--r', `${360 + Math.random() * 720}deg`);
+    s.style.setProperty('--t', `${1.4 + Math.random() * 1.2}s`);
+    s.style.setProperty('--delay', `${Math.random() * 0.4}s`);
+    box.append(s);
+  }
+  return box;
+}
+
+/* =====================================================================
+   Mode 1: Word Wheel
+   ===================================================================== */
+const wordInput = $('#word-input');
+const wordHint = $('#word-hint');
+const views = $$('#word [data-view]');
+let lookupToken = 0;
+let wheelItems = [];
+let currentSenseKey = null;
+let wordWheel = null;
+
+function showView(name) {
+  for (const v of views) v.hidden = v.dataset.view !== name;
+  window.scrollTo(0, 0);
+}
+
+function newWord() {
+  lookupToken++;
+  closeCard();
+  wordInput.value = '';
+  wordHint.textContent = '';
+  showView('input');
+  wordInput.focus();
+}
+
+$('#word-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const word = normalize(wordInput.value);
+  if (!word) {
+    wordHint.textContent = 'Type a word first!';
+    wordInput.classList.remove('shake');
+    void wordInput.offsetWidth;
+    wordInput.classList.add('shake');
+    return;
+  }
+  wordInput.blur();
+  handleWord(word);
+});
+
+async function handleWord(word) {
+  const token = ++lookupToken;
+  const key = findBuiltIn(word);
+  if (key) {
+    const entry = WORDS[key];
+    if (entry.senses) showSenses(key);
+    else buildWordWheel(entry.words.map(([w, d, e]) => ({ w, d, e, src: 'builtin' })), key, null);
+    return;
+  }
+
+  const cached = store.get('syn:' + word);
+  if (cached && cached.results && cached.results.length) {
+    buildOnlineWheel(word, cached.results);
+    return;
+  }
+
+  showView('loading');
+  const res = await lookupOnline(word);
+  if (token !== lookupToken) return; // the adult moved on while we waited
+  if (res.status === 'found') {
+    store.set('syn:' + word, { results: res.results, pos: res.pos });
+    buildOnlineWheel(word, res.results);
+  } else {
+    showFallback(word, res.status);
+  }
+}
+
+function showSenses(key) {
+  currentSenseKey = key;
+  $('#sense-heading').textContent = `${capitalize(key)} like…`;
+  $('#sense-chips').replaceChildren(...WORDS[key].senses.map(sense =>
+    h('button', {
+      class: 'chip',
+      type: 'button',
+      onclick: () => buildWordWheel(sense.words.map(([w, d, e]) => ({ w, d, e, src: 'builtin' })), key, sense.label),
+    }, `${sense.icon} ${sense.label}`)
+  ));
+  showView('senses');
+}
+
+function showFallback(word, status) {
+  $('#fallback-msg').textContent = status === 'offline'
+    ? 'That word isn’t in my word book yet.'
+    : 'Hmm, I don’t know that one yet. Try another word!';
+  const matches = closeMatches(word);
+  const tryBox = $('#fallback-try');
+  tryBox.replaceChildren(...(matches.length
+    ? [h('span', { class: 'try-label' }, 'Try:'),
+       ...matches.map(k => h('button', { class: 'chip', type: 'button', onclick: () => handleWord(k) }, k))]
+    : []));
+  showView('fallback');
+}
+
+function buildOnlineWheel(word, results) {
+  const items = shuffled(results).slice(0, 8).map(r => ({ w: r.w, pos: r.pos, alt: r.alt, src: 'online' }));
+  buildWordWheel(items, word, null, true);
+  // Fetch definitions while the wheel spins so the card is usually ready when it lands.
+  // Two at a time: the dictionary errors more when it gets many requests at once.
+  mapLimit(items, 2, item => getDefinition(item.w, item.pos));
+}
+
+function buildWordWheel(items, title, senseLabel, alreadyPicked = false) {
+  wheelItems = alreadyPicked ? items : shuffled(items).slice(0, 8);
+  const heading = $('#word-wheel-title');
+  heading.replaceChildren();
+  if (title) heading.append('Better words for ', h('strong', {}, `“${title}”`), senseLabel ? ` (${senseLabel})` : '');
+  else heading.append(h('strong', {}, 'Your own wheel'));
+  $('#other-sense').hidden = !senseLabel;
+  showView('wheel');
+  if (!wordWheel) wordWheel = new Wheel($('#word-wheel-col'), spinWord);
+  wordWheel.setItems(wheelItems.map(i => i.w));
+}
+
+$('#other-sense').addEventListener('click', () => {
+  if (currentSenseKey) showSenses(currentSenseKey);
+});
+
+/* ---------- Make my own wheel ---------- */
+$('#make-own-btn').addEventListener('click', () => {
+  $('#own-input').value = '';
+  $('#own-hint').textContent = 'Put a comma or space between the words.';
+  showView('own');
+  $('#own-input').focus();
+});
+
+$('#own-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const words = [...new Set($('#own-input').value.split(/[,\s]+/).map(normalize).filter(Boolean))];
+  const hint = $('#own-hint');
+  if (words.length < 3) { hint.textContent = `Add ${3 - words.length} more word${words.length === 2 ? '' : 's'}. You need at least 3.`; return; }
+  if (words.length > 8) { hint.textContent = `That’s ${words.length} words. Take out ${words.length - 8} so there are 8 or fewer.`; return; }
+  $('#own-input').blur();
+  buildWordWheel(words.map(w => ({ w, src: 'own' })), null, null, true);
+});
+
+/* ---------- Spin + result card ---------- */
+const wordSpinBtn = $('#word-spin');
+wordSpinBtn.addEventListener('click', spinWord);
+
+async function spinWord() {
+  if (!wordWheel || wordWheel.spinning || !cardEl.hidden) return;
+  Sound.context();
+  const token = navToken;
+  wordSpinBtn.disabled = true;
+  const idx = await wordWheel.spin();
+  wordSpinBtn.disabled = false;
+  if (idx === null || token !== navToken) return;
+  Sound.land();
+  showWordCard(wheelItems[idx]);
+}
+
+async function definitionFor(item) {
+  if (item.src === 'builtin') return { d: item.d, e: item.e };
+  if (item.src === 'own') {
+    const known = KNOWN_DEFS.get(item.w) || store.get('def:' + item.w);
+    return known && known.d ? known : { d: null, missing: 'Ask your helper!' };
+  }
+  // With a backup definition in hand, don't keep the kid waiting on a slow dictionary.
+  const lookup = getDefinition(item.w, item.pos);
+  const def = await (item.alt ? Promise.race([lookup, wait(800)]) : lookup);
+  if (def && def.d) return def;
+  if (item.alt) return { d: item.alt };
+  return { d: null, missing: 'No definition found, so ask your helper!' };
+}
+
+async function showWordCard(item) {
+  const defEl = h('p', { class: 'card-def pending' }, 'Looking it up…');
+  const exEl = h('p', { class: 'card-example', hidden: true });
+  let spoken = item.w;
+  const hear = speechOK ? h('button', { class: 'btn ghost hear-btn', type: 'button', onclick: () => speak(spoken) }, '🔊 Hear it') : null;
+
+  openCard(h('div', { class: 'card-inner' },
+    h('p', { class: 'card-kicker' }, 'Try this word:'),
+    h('h2', { class: 'card-word', id: 'card-title' }, item.w),
+    defEl,
+    exEl,
+    hear,
+    h('p', { class: 'card-question' }, 'Does this mean what you want to say?'),
+    h('div', { class: 'card-actions' },
+      h('button', { class: 'btn yes', type: 'button', onclick: () => acceptWord(item.w) }, 'Yes, use it!'),
+      h('button', { class: 'btn ghost', type: 'button', onclick: () => { closeCard(); spinWord(); } }, 'No, spin again'),
+    ),
+  ));
+
+  const token = cardToken;
+  const def = await definitionFor(item);
+  if (token !== cardToken) return;
+  defEl.classList.remove('pending');
+  if (def.d) {
+    defEl.textContent = asSentence(def.d);
+    spoken = `${item.w}. ${asSentence(def.d)}`;
+  } else {
+    defEl.textContent = def.missing;
+  }
+  if (def.e) {
+    exEl.replaceChildren(...exampleNode(def.e, item.w));
+    exEl.hidden = false;
+  }
+}
+
+function acceptWord(word) {
+  Sound.cheer();
+  const token = navToken;
+  const done = () => {
+    if (token !== navToken || cardEl.hidden) return;
+    closeCard();
+    newWord();
+  };
+  openCard(h('div', { class: 'card-inner' },
+    h('div', { class: 'celebrate-emoji', 'aria-hidden': 'true' }, '🎉'),
+    h('h2', { class: 'card-word', id: 'card-title' }, 'Great choice!'),
+    h('p', { class: 'card-prompt' }, 'Write ', h('b', {}, word), ' in your story.'),
+    h('div', { class: 'card-actions' }, h('button', { class: 'btn primary', type: 'button', onclick: done }, 'Next word')),
+  ));
+  const party = confetti();
+  if (party) cardBox.append(party);
+  setTimeout(done, 3200);
+}
+
+/* =====================================================================
+   Mode 2: Stuck Wheel
+   ===================================================================== */
+const stuckSpinBtn = $('#stuck-spin');
+let stuckWheel = null;
+
+function ensureStuckWheel() {
+  if (!stuckWheel) {
+    stuckWheel = new Wheel($('#stuck-wheel-col'), spinStuck);
+    stuckWheel.setItems(STUCK_MOVES.map(m => m.label));
+  }
+}
+
+stuckSpinBtn.addEventListener('click', spinStuck);
+
+async function spinStuck() {
+  if (!stuckWheel || stuckWheel.spinning || !cardEl.hidden) return;
+  Sound.context();
+  const token = navToken;
+  stuckSpinBtn.disabled = true;
+  const idx = await stuckWheel.spin();
+  stuckSpinBtn.disabled = false;
+  if (idx === null || token !== navToken) return;
+  Sound.land();
+  const move = STUCK_MOVES[idx];
+  openCard(h('div', { class: 'card-inner' },
+    h('p', { class: 'card-kicker' }, 'Try this:'),
+    h('h2', { class: 'card-word', id: 'card-title' }, move.label),
+    h('p', { class: 'card-prompt' }, move.prompt),
+    h('p', { class: 'card-example' }, h('span', { class: 'example-label' }, 'Example: '), move.example),
+    speechOK ? h('button', { class: 'btn ghost hear-btn', type: 'button', onclick: () => speak(`${move.prompt} For example: ${move.example}`) }, '🔊 Hear it') : null,
+    h('div', { class: 'card-actions' },
+      h('button', { class: 'btn primary', type: 'button', onclick: () => { closeCard(); spinStuck(); } }, 'Spin again'),
+      h('button', { class: 'btn ghost', type: 'button', onclick: closeCard }, 'Got it!'),
+    ),
+  ));
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !cardEl.hidden && !screens.stuck.hidden) closeCard();
+});
+
+/* =====================================================================
+   Hidden helper settings: press and hold the monster on Home
+   ===================================================================== */
+const homeMascot = $('.mascot-home');
+let holdTimer = null;
+const stopHold = () => { clearTimeout(holdTimer); holdTimer = null; };
+homeMascot.addEventListener('pointerdown', () => {
+  stopHold();
+  holdTimer = setTimeout(() => {
+    homeMascot.classList.add('wiggle');
+    setTimeout(() => { homeMascot.classList.remove('wiggle'); go('settings'); }, 450);
+  }, 1500);
+});
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => homeMascot.addEventListener(ev, stopHold));
+homeMascot.addEventListener('contextmenu', e => e.preventDefault());
+
+const savedWords = () => store.keys().filter(k => k.startsWith('syn:'));
+
+function refreshSettings() {
+  const n = savedWords().length;
+  $('#saved-count').textContent = n
+    ? `${n} looked-up word${n === 1 ? '' : 's'} saved on this device. They work without Wi-Fi.`
+    : 'No looked-up words saved yet.';
+  $('#builtin-list').textContent = Object.keys(WORDS).sort().join(', ');
+}
+
+$('#prewarm-btn').addEventListener('click', async () => {
+  const btn = $('#prewarm-btn');
+  const status = $('#prewarm-status');
+  const words = [...new Set($('#prewarm-input').value.split(/[\s,;]+/).map(normalize).filter(Boolean))];
+  if (!words.length) { status.textContent = 'Paste some words first.'; return; }
+  btn.disabled = true;
+  let saved = 0, builtIn = 0, unknown = 0, offline = 0;
+  for (const [i, word] of words.entries()) {
+    status.textContent = `Saving ${i + 1} of ${words.length}: ${word}…`;
+    if (findBuiltIn(word)) { builtIn++; continue; }
+    let entry = store.get('syn:' + word);
+    if (!entry) {
+      const res = await lookupOnline(word);
+      if (res.status === 'offline') {
+        offline++;
+        if (saved === 0 && offline >= 2) break; // no connection, stop trying
+        continue;
+      }
+      if (res.status === 'none') { unknown++; continue; }
+      entry = { results: res.results, pos: res.pos };
+      store.set('syn:' + word, entry);
+    }
+    await mapLimit(entry.results, 2, r => getDefinition(r.w, r.pos));
+    saved++;
+  }
+  const parts = [`${saved} saved`];
+  if (builtIn) parts.push(`${builtIn} already built in`);
+  if (unknown) parts.push(`${unknown} not found`);
+  if (offline) parts.push(`${offline} couldn’t download (check Wi-Fi and try again)`);
+  status.textContent = `Done: ${parts.join(', ')}.`;
+  btn.disabled = false;
+  refreshSettings();
+});
+
+const clearBtn = $('#clear-btn');
+let clearArmed = null;
+clearBtn.addEventListener('click', () => {
+  if (!clearArmed) {
+    clearBtn.textContent = 'Tap again to clear';
+    clearBtn.classList.add('danger');
+    clearArmed = setTimeout(() => {
+      clearArmed = null;
+      clearBtn.textContent = 'Clear saved words';
+      clearBtn.classList.remove('danger');
+    }, 3000);
+    return;
+  }
+  clearTimeout(clearArmed);
+  clearArmed = null;
+  for (const k of store.keys()) store.remove(k);
+  clearBtn.textContent = 'Clear saved words';
+  clearBtn.classList.remove('danger');
+  refreshSettings();
+});
+
+/* =====================================================================
+   Start up
+   ===================================================================== */
+for (const el of $$('[data-mascot]')) el.append($('#mascot-tpl').content.cloneNode(true));
+renderMute();
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeech(); });
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+})();
+</script>
+</body>
+</html>
